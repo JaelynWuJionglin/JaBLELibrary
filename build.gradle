@@ -1,0 +1,22 @@
+buildscript {
+    ext{
+        kotlin_version = "1.9.0"
+        appcompat_version = "1.5.0"
+        gson_version = "2.10"
+        minSdk = 19
+        targetSdk = 33
+
+        versionCode = 1
+        versionName = "1.0.1"
+    }
+}
+
+plugins {
+    id("com.android.application") version "8.1.3" apply false
+    id("com.android.library") version '8.1.3' apply false
+    id("org.jetbrains.kotlin.android") version "1.7.20" apply false
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.buildDir
+}
