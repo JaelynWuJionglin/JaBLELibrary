@@ -103,6 +103,14 @@ public class BLEDevice extends IBluetoothGattCallback {
     }
 
     /**
+     * 设置连接超时时间
+     */
+    public BLEDevice setConnectOutTime(long outTime){
+        bleConnect.setConnectOutTime(outTime);
+        return this;
+    }
+
+    /**
      * 连接设备
      */
     public boolean connect() {

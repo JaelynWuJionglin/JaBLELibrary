@@ -32,6 +32,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * 蓝牙操作主类
  */
 public class BLEManager {
+    public static final long DEF_CONNECT_OUT_TIME = 15 * 1000;
     private volatile static BLEManager instance = null;
     private final CopyOnWriteArrayList<BLEConnectStatusCallback> bleConnectStatusCallbackList = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<BLENotificationCallback> notificationCallbackList = new CopyOnWriteArrayList<>();
@@ -42,6 +43,7 @@ public class BLEManager {
     private BluetoothAdapter mBluetoothAdapter = null;
     private List<NotificationFormat> notificationFormatList;
     private BLEConfig bleConfig;
+    private long connectOutTime = DEF_CONNECT_OUT_TIME;
 
     private BLEManager() {
     }
@@ -256,6 +258,15 @@ public class BLEManager {
     }
 
     /**
+     * 连接超时时常
+     * @param outTime 大于6*1000
+     */
+    public BLEManager setConnectOutTime(long outTime) {
+        this.connectOutTime = outTime;
+        return this;
+    }
+
+    /**
      * 连接设备
      */
     public boolean connectDevice(BLEDevice bleDevice) {
@@ -276,6 +287,7 @@ public class BLEManager {
         if (notificationFormatList != null && !notificationFormatList.isEmpty()) {
             bleDevice.setBefConnectEnNotificationList(notificationFormatList);
         }
+        bleDevice.setConnectOutTime(connectOutTime);
         if (bleDevice.connect()) {
             befConnectDeviceList.add(bleDevice);
             return true;

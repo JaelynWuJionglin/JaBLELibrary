@@ -49,6 +49,7 @@ class BLEConnect implements BLEConnectCallback {
     private final BLEManager bleManager;
     private BLEDevice bleDevice;
     private BluetoothGatt bluetoothGatt;
+    private long connectOutTime = BLEManager.DEF_CONNECT_OUT_TIME;
     private boolean isConnecting = false;
     private boolean isConnected = false;
     private boolean isMtuRequested = false;
@@ -121,6 +122,13 @@ class BLEConnect implements BLEConnectCallback {
         return isConnected;
     }
 
+    @Override
+    public void setConnectOutTime(long outTime) {
+        if (outTime > 6 * 1000) {
+            this.connectOutTime = outTime;
+        }
+    }
+
     /**
      * 连接设备
      */
@@ -168,11 +176,7 @@ class BLEConnect implements BLEConnectCallback {
 
         //开启超时检测
         if (bleConnectHandler != null) {
-            long outTime = bleManager.getBleConfig().CONNECT_OVER_TIME;
-            if (outTime < 15 * 1000) {
-                outTime = 15 * 1000;
-            }
-            postMessageDelayed(hanConnectOutTime,outTime);
+            postMessageDelayed(hanConnectOutTime,connectOutTime);
         }
 
         return true;
