@@ -194,13 +194,12 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             if (isScanning) {
                 //正在扫描中，则继续扫描， 不停止。
                 isNeedStop = false;
-                handler.removeCallbacks(runnableStop);
             } else {
                 handler.removeCallbacks(runnableStart);
                 handler.postDelayed(runnableStart, 200);
-                handler.removeCallbacks(runnableStop);
-                handler.postDelayed(runnableStop, SCAN_TIME);
             }
+            handler.removeCallbacks(runnableStop);
+            handler.postDelayed(runnableStop, SCAN_TIME);
         }
     }
 

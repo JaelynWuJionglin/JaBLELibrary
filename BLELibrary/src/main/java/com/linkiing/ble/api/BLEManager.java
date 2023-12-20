@@ -290,8 +290,10 @@ public class BLEManager {
         bleDevice.setConnectOutTime(connectOutTime);
         if (bleDevice.connect()) {
             befConnectDeviceList.add(bleDevice);
+            connectOutTime = DEF_CONNECT_OUT_TIME;
             return true;
         } else {
+            connectOutTime = DEF_CONNECT_OUT_TIME;
             return false;
         }
     }
