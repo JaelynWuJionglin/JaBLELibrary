@@ -295,6 +295,7 @@ class BLEConnect implements BLEConnectCallback {
                             }
                             if (bluetoothGatt == null) {
                                 LOGUtils.e(TAG + " Error! bluetoothGatt == null");
+                                isConnecting = false;
                                 bleDisconnect(1);
                                 postConnectStatus(BLEConstant.BLE_STATUS_CONNECT_FAIL);
                             } else {
@@ -303,6 +304,7 @@ class BLEConnect implements BLEConnectCallback {
                         }
                     } else {
                         LOGUtils.e(TAG + " Error! handleMessage bluetoothGattCallback == null");
+                        isConnecting = false;
                         bleDisconnect(2);
                         postConnectStatus(BLEConstant.BLE_STATUS_CONNECT_FAIL);
                     }
@@ -324,6 +326,7 @@ class BLEConnect implements BLEConnectCallback {
                         //重新扫描服务
                         discoverServices();
                     } else {
+                        isConnecting = false;
                         bleDisconnect(4);
                         postConnectStatus(BLEConstant.BLE_STATUS_CONNECT_FAIL);
                     }
@@ -357,6 +360,7 @@ class BLEConnect implements BLEConnectCallback {
 
                                 postMessageDelayed(hanSetNotification, 350);
                             } else {
+                                isConnecting = false;
                                 bleDisconnect(5);
                                 postConnectStatus(BLEConstant.BLE_STATUS_CONNECT_FAIL);
                             }
@@ -374,6 +378,7 @@ class BLEConnect implements BLEConnectCallback {
                     postConnectStatus(BLEConstant.BLE_STATUS_CONNECTED);
                     break;
                 case hanConnectOutTime:
+                    isConnecting = false;
                     bleDisconnect(6);
                     postConnectStatus(BLEConstant.BLE_STATUS_CONNECT_TIME_OUT);
                     break;
@@ -394,6 +399,7 @@ class BLEConnect implements BLEConnectCallback {
             bleConnectHandler.removeMessages(what);
             bleConnectHandler.sendEmptyMessageDelayed(what, delayMillis);
         } else {
+            isConnecting = false;
             bleDisconnect(7);
             postConnectStatus(BLEConstant.BLE_STATUS_CONNECT_FAIL);
         }

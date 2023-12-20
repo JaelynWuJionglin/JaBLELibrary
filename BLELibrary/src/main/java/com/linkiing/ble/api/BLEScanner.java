@@ -32,29 +32,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @SuppressLint("MissingPermission")
 public class BLEScanner extends ScanCallback implements BackstageUtils.BackstageListener {
     private volatile static BLEScanner instance = null;
-
     private final CopyOnWriteArrayList<BLEScanDeviceCallback> bleScanDeviceCallbackList = new CopyOnWriteArrayList<>();
-
     //上一次开始扫描和结束扫描的时间间隔
     private final long MIN_SCAN_TIME = 6 * 1000;
     //相同设备发送间隔
     private final long SEND_VALUE_TIME = 500;
-
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
-    //Handler
     private final Handler handler = new Handler(Looper.getMainLooper());
-
     //过滤名称字符串
     private String FILTER_NAME_STR = "";
     //过滤广播包
     private final List<byte[]> FILTER_RECORD = new ArrayList<>();
     //过滤信号强度等级
     private int FILTER_RSSI_LEVEL = 0;
-
     //自定义过滤
     private BLEScannerFilterCallback bleScannerFilterCallback;
-
     //是否真正扫描
     private boolean isScanning = false;
     private boolean isNeedStop = true;
@@ -65,6 +58,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     private long callBackTime = 0;
     private boolean isStart = false;
     private boolean backstageChangeScanning = false;
+    private boolean isBackstageStop = false;
     private final List<BLEDevice> deviceList = new ArrayList<>();
 
     private BLEScanner() {
@@ -188,8 +182,6 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
         if (nowScan) {
             handler.removeCallbacks(runnableStart);
             handler.postDelayed(runnableStart, 200);
-            handler.removeCallbacks(runnableStop);
-            handler.postDelayed(runnableStop, SCAN_TIME);
         } else {
             if (isScanning) {
                 //正在扫描中，则继续扫描， 不停止。
@@ -198,9 +190,10 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
                 handler.removeCallbacks(runnableStart);
                 handler.postDelayed(runnableStart, 200);
             }
-            handler.removeCallbacks(runnableStop);
-            handler.postDelayed(runnableStop, SCAN_TIME);
         }
+        handler.removeCallbacks(runnableStop);
+        handler.postDelayed(runnableStop, SCAN_TIME);
+        isNeedStop = true;
     }
 
     /**
@@ -439,6 +432,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * runnableStop
      */
     private final Runnable runnableStop = () -> {
+        LOGUtils.d("BLEScanner runnableStop  isNeedStop:" + isNeedStop);
         if (isNeedStop) {
             isScan(false, 1);
             for (BLEScanDeviceCallback scanDeviceCallback : bleScanDeviceCallbackList) {
@@ -529,9 +523,14 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             backstageChangeScanning = isScanning;
             if (isScanning) {
                 stopScan(1);
+                isBackstageStop = true;
             }
         } else {
-            startScan(false);
+            //从后台回到前台
+            if (isBackstageStop) {
+                isBackstageStop = false;
+                startScan(false);
+            }
         }
     }
 }
