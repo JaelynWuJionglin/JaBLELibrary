@@ -5,8 +5,6 @@ package com.linkiing.ble.api;
  */
 public class BLEConfig {
 
-    private BLEConfig() {}
-
     /**
      * 允许蓝牙连接设备数量上限
      * (最小可连接数量1，最大可连接数量8)

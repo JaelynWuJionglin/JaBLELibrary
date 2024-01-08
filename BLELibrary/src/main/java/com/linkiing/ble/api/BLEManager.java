@@ -42,11 +42,10 @@ public class BLEManager {
     private BluetoothManager mBluetoothManager = null;
     private BluetoothAdapter mBluetoothAdapter = null;
     private List<NotificationFormat> notificationFormatList;
-    private BLEConfig bleConfig;
+    private BLEConfig bleConfig = new BLEConfig();
     private long connectOutTime = DEF_CONNECT_OUT_TIME;
 
-    private BLEManager() {
-    }
+    private BLEManager() {}
 
     /**
      * 单利模式（线程安全）

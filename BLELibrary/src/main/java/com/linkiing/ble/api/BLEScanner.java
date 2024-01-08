@@ -163,7 +163,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     public void clearFilters() {
         this.FILTER_NAME_STR = "";
         this.FILTER_RECORD.clear();
-        this.FILTER_RSSI_LEVEL = 100;
+        this.FILTER_RSSI_LEVEL = 0;
         this.bleScannerFilterCallback = null;
     }
 
