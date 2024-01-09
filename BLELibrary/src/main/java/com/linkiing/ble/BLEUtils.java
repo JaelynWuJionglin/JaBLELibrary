@@ -14,6 +14,7 @@ import com.linkiing.ble.api.BLEManager;
 import com.linkiing.ble.log.LOGUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class BLEUtils {
@@ -43,13 +44,13 @@ public class BLEUtils {
                 return null;
             }
             for (BluetoothGattService gattService : GattService) {
-                if (gattService.getUuid().toString().trim().equals(ServicesUUID)) {
+                if (gattService.getUuid().toString().trim().toLowerCase(Locale.ENGLISH).equals(ServicesUUID.toLowerCase(Locale.ENGLISH))) {
                     List<BluetoothGattCharacteristic> mGattCharacteristic = gattService.getCharacteristics();
                     if (mGattCharacteristic.size() == 0) {
                         return null;
                     }
                     for (BluetoothGattCharacteristic gattCharacteristic : mGattCharacteristic) {
-                        if (gattCharacteristic.getUuid().toString().trim().equals(CharacteristicUUID)) {
+                        if (gattCharacteristic.getUuid().toString().trim().toLowerCase(Locale.ENGLISH).equals(CharacteristicUUID.toLowerCase(Locale.ENGLISH))) {
                             mBluetoothGattCharacteristic = gattCharacteristic;
                         }
                     }
