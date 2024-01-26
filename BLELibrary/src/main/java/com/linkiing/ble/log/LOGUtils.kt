@@ -1,4 +1,4 @@
-package com.linkiing.ble.log
+package com.jaylen.serialportlibrary.log
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -27,7 +27,7 @@ import kotlin.system.exitProcess
 object LOGUtils {
     private const val TAG = "LK_BLE"
     private const val LINE_MAX = 3 * 1024
-    private const val MAX_LOG_FILE_SIZE = 10 //最大日志保存数量，最小为1
+    private const val MAX_LOG_FILE_SIZE = 5 //最大日志保存数量，最小为1
     private var logPath: String = "" //日志文件保存路径
     private var mDefaultHandler: Thread.UncaughtExceptionHandler? = null
     private val erInfoMap: MutableMap<String, String> = HashMap() //用来存储设备信息和异常信息
@@ -68,7 +68,7 @@ object LOGUtils {
         Thread {
             val shareDir = "${FileJaUtils.getParentFilePath(mApplication!!)}${File.separator}LOGZip"
             val shareFile = File(shareDir)
-            if (!shareFile.exists()){
+            if (!shareFile.exists()) {
                 shareFile.mkdirs()
             }
 
@@ -411,32 +411,35 @@ object LOGUtils {
      */
     //当UncaughtException发生时会转入该函数来处理
     private val mUncaughtExceptionHandler =
-        Thread.UncaughtExceptionHandler { thread: Thread, ex: Throwable? ->
-            if (!handleException(
-                    thread,
-                    ex
-                ) && mDefaultHandler != null
-            ) {
-                //如果用户没有处理则让系统默认的异常处理器来处理
-                if (ex != null) {
-                    mDefaultHandler!!.uncaughtException(thread, ex)
+        Thread.UncaughtExceptionHandler { thread: Thread?, throwable: Throwable? ->
+            if (thread == null || throwable == null) {
+                logCat("w", "mUncaughtExceptionHandler thread == null || throwable == null")
+                return@UncaughtExceptionHandler
+            }
+            try {
+                if (!handleException(
+                        thread,
+                        throwable
+                    ) && mDefaultHandler != null
+                ) {
+                    //如果用户没有处理则让系统默认的异常处理器来处理
+                    mDefaultHandler!!.uncaughtException(thread, throwable)
+                } else {
+                    try {
+                        Thread.sleep(3000)
+                    } catch (e: InterruptedException) {
+                        logCat("w", e.toString())
+                    }
+                    //退出程序
+                    Process.killProcess(Process.myPid())
+                    exitProcess(1)
                 }
-            } else {
-                try {
-                    Thread.sleep(3000)
-                } catch (e: InterruptedException) {
-                    logCat("w", e.toString())
-                }
-                //退出程序
-                Process.killProcess(Process.myPid())
-                exitProcess(1)
+            } catch (e: Exception) {
+                logCat("w", e.toString())
             }
         }
 
-    private fun handleException(thread: Thread, throwable: Throwable?): Boolean {
-        if (throwable == null) {
-            return false
-        }
+    private fun handleException(thread: Thread, throwable: Throwable): Boolean {
         //收集设备参数信息
         collectDeviceInfo(mApplication)
         //保存日志文件
@@ -474,7 +477,7 @@ object LOGUtils {
                 try {
                     field.isAccessible = true
                     erInfoMap[field.name] = (field[null]?.toString() ?: "null") + ""
-                    logCat("d", field.name + " : " + field[null])
+                    //logCat("d", field.name + " : " + field[null])
                 } catch (e: Exception) {
                     logCat("w", "an error occured when collect crash info \n $e")
                 }
@@ -483,7 +486,7 @@ object LOGUtils {
     }
 
     //保存错误信息到文件中
-    private fun saveCrashInfo2File(thread: Thread?, throwable: Throwable) {
+    private fun saveCrashInfo2File(thread: Thread, throwable: Throwable) {
         val sb = StringBuilder()
         for ((key, value) in erInfoMap) {
             sb.append(key)
@@ -495,7 +498,7 @@ object LOGUtils {
         dateFormat.applyPattern("[yyyy-MM-dd HH:mm:ss.SSS]")
         val time = dateFormat.format(Date())
         sb.append(time)
-        if (thread != null && mApplication != null) {
+        if (mApplication != null) {
             sb.append("FATAL EXCEPTION:")
                 .append(thread.name)
                 .append("\n")
@@ -517,11 +520,7 @@ object LOGUtils {
         val result = writer.toString()
         sb.append(result)
 
-        try {
-            //保存日志到文件
-            pointLogToFile(TAG, sb.toString())
-        } catch (e: java.lang.Exception) {
-            logCat("w", e.toString())
-        }
+        //打印并保存日志
+        logCat("e", sb.toString())
     }
 }
