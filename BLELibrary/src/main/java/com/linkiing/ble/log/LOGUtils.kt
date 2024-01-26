@@ -1,4 +1,4 @@
-package com.jaylen.serialportlibrary.log
+package com.linkiing.ble.log
 
 import android.annotation.SuppressLint
 import android.app.Application
