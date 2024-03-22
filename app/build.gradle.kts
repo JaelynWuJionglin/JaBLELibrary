@@ -48,6 +48,6 @@ dependencies {
     implementation(project(mapOf("path" to ":BLELibrary")))
 
     //权限 （BLELibrary需要）
-    implementation("com.github.getActivity:XXPermissions:13.2")
+    implementation("com.github.getActivity:XXPermissions:18.5")
     //============================================================================
 }

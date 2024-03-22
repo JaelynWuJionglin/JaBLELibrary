@@ -1,14 +1,11 @@
 package com.ble.demo.app
 
-import android.app.Activity
 import android.app.Application
 import com.linkiing.ble.api.BLEConfig
 import com.linkiing.ble.api.BLEManager
 import com.linkiing.ble.log.LOGUtils
-import java.util.Stack
 
 class App : Application() {
-    private val activityStack = Stack<Activity>()
 
     companion object {
         private lateinit var mThis: App
@@ -27,7 +24,8 @@ class App : Application() {
 
         //BLE初始化
         BLEManager.getInstance()
-            .setBleConfig(BLEConfig.getBLEConfig(1, 30 * 1000))
+            .setBleConfig(BLEConfig.getBLEConfig(1))
+            .setConnectOutTime(15 * 1000)
             .init(this)
     }
 }
