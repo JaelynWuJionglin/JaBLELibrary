@@ -2,6 +2,7 @@ package com.linkiing.ble;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 
 /**
  * 写回应
@@ -14,6 +15,13 @@ interface BLEWriteCallback {
      * @param characteristic BluetoothGattCharacteristic
      */
     void onCharacteristicWriteCallback(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic);
+
+    /**
+     * 特侦值写回调
+     * @param gatt           BluetoothGatt
+     * @param descriptor     BluetoothGattDescriptor
+     */
+    void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor);
 
     /**
      * 数据读回调

@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 
 import com.linkiing.ble.api.BLEManager;
 import com.linkiing.ble.callback.BLENotificationCallback;
 import com.linkiing.ble.callback.BLEReadCallback;
+import com.linkiing.ble.callback.BLEReadRssiCallback;
 import com.linkiing.ble.log.LOGUtils;
 
 /**
@@ -37,6 +39,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+        super.onConnectionStateChange(gatt, status, newState);
         LOGUtils.v("onConnectionStateChange ==> status:" + status + "   newState:" + newState);
         if (!isThisGatt(gatt)) {
             return;
@@ -50,6 +53,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
 
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        super.onServicesDiscovered(gatt, status);
         if (!isThisGatt(gatt)) {
             return;
         }
@@ -62,6 +66,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
      */
     @Override
     public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        super.onCharacteristicWrite(gatt, characteristic, status);
         if (!isThisGatt(gatt)) {
             return;
         }
@@ -70,11 +75,58 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
         }
     }
 
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        super.onDescriptorWrite(gatt, descriptor, status);
+
+        if (!isThisGatt(gatt)) {
+            return;
+        }
+
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            bleConnect.onDescriptorWrite(gatt, descriptor);
+            bleCommandPolicy.onDescriptorWrite(gatt, descriptor);
+        }
+    }
+
+    /**
+     * 通知
+     */
+    @Override
+    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+        super.onCharacteristicChanged(gatt, characteristic);
+        if (!isThisGatt(gatt)) {
+            return;
+        }
+        if (characteristic != null) {
+            String uuid = characteristic.getUuid().toString();
+            byte[] bytes = characteristic.getValue();
+            for (BLENotificationCallback notificationCallback : BLEManager.getInstance().getNotificationCallbackList()) {
+                if (notificationCallback != null) {
+                    notificationCallback.onNotificationCallback(getCurrentDevice(), uuid, bytes);
+                }
+            }
+        }
+    }
+
+    /**
+     * mtu
+     */
+    @Override
+    public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+        super.onMtuChanged(gatt, mtu, status);
+        if (!isThisGatt(gatt)) {
+            return;
+        }
+        bleConnect.onBLEMtuChanged(mtu, status);
+    }
+
     /**
      * 读回应
      */
     @Override
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        super.onCharacteristicRead(gatt, characteristic, status);
         if (status == BluetoothGatt.GATT_SUCCESS) {
             if (!isThisGatt(gatt)) {
                 return;
@@ -82,8 +134,8 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
             if (characteristic != null) {
                 String uuid = characteristic.getUuid().toString();
                 byte[] bytes = characteristic.getValue();
-                for (BLEReadCallback readCallback : BLEManager.getInstance().getReadCallbackList()){
-                    if (readCallback != null){
+                for (BLEReadCallback readCallback : BLEManager.getInstance().getReadCallbackList()) {
+                    if (readCallback != null) {
                         readCallback.onReadCallback(getCurrentDevice(), uuid, bytes);
                     }
                 }
@@ -93,30 +145,20 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     }
 
     /**
-     * 通知
+     * 读信号值
      */
     @Override
-    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        if (!isThisGatt(gatt)) {
-            return;
-        }
-        if (characteristic != null) {
-            String uuid = characteristic.getUuid().toString();
-            byte[] bytes = characteristic.getValue();
-            for (BLENotificationCallback notificationCallback : BLEManager.getInstance().getNotificationCallbackList()){
-                if (notificationCallback != null){
-                    notificationCallback.onNotificationCallback(getCurrentDevice(), uuid, bytes);
+    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+        super.onReadRemoteRssi(gatt, rssi, status);
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            if (!isThisGatt(gatt)) {
+                return;
+            }
+            for (BLEReadRssiCallback readRssiCallback : BLEManager.getInstance().getReadRssiCallbackList()) {
+                if (readRssiCallback != null) {
+                    readRssiCallback.onReadRssiCallback(rssi);
                 }
             }
         }
-    }
-
-    @Override
-    public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
-        super.onMtuChanged(gatt, mtu, status);
-        if (!isThisGatt(gatt)) {
-            return;
-        }
-        bleConnect.onBLEMtuChanged(mtu, status);
     }
 }

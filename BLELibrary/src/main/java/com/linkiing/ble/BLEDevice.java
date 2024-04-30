@@ -103,6 +103,13 @@ public class BLEDevice extends IBluetoothGattCallback {
     }
 
     /**
+     * 设备是否在连接中
+     */
+    public boolean isConnecting() {
+        return bleConnect.isConnecting();
+    }
+
+    /**
      * 设置连接超时时间
      */
     public BLEDevice setConnectOutTime(long outTime){
@@ -117,11 +124,8 @@ public class BLEDevice extends IBluetoothGattCallback {
         return bleConnect.connect(this);
     }
 
-    /**
-     * 断开设备连接
-     */
-    public boolean disconnect() {
-        return bleConnect.disconnect();
+    public boolean readRssi() {
+        return bleConnect.readRssi();
     }
 
     /**
@@ -129,6 +133,13 @@ public class BLEDevice extends IBluetoothGattCallback {
      */
     public void gattClose() {
         bleConnect.gattClose();
+    }
+
+    /**
+     * 断开设备连接
+     */
+    public boolean disconnect() {
+        return bleConnect.disconnect();
     }
 
     /**

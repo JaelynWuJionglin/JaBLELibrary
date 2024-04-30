@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Build;
@@ -17,6 +18,7 @@ import com.linkiing.ble.api.BLEManager;
 import com.linkiing.ble.callback.BLEConnectStatusCallback;
 import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
+import com.linkiing.ble.utils.ByteUtils;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
@@ -115,11 +117,19 @@ class BLEConnect implements BLEConnectCallback {
     }
 
     /**
-     * 正在连接设备或者设备连接中
+     * 设备已连接
      */
     @Override
     public boolean isConnect() {
         return isConnected;
+    }
+
+    /**
+     * 正在连接设备中
+     */
+    @Override
+    public boolean isConnecting() {
+        return isConnecting;
     }
 
     @Override
@@ -197,6 +207,14 @@ class BLEConnect implements BLEConnectCallback {
     }
 
     @Override
+    public boolean readRssi() {
+        if (bluetoothGatt != null) {
+            return bluetoothGatt.readRemoteRssi();
+        }
+        return false;
+    }
+
+    @Override
     public boolean disconnect() {
         synchronized (BLUETOOTH_GATT_LOCK) {
             if (bluetoothGatt != null) {
@@ -224,6 +242,7 @@ class BLEConnect implements BLEConnectCallback {
                 bluetoothGatt.close();
                 bluetoothGatt = null;
             }
+            isConnecting = false;
             isConnected = false;
             notificationSetList.clear();
             removeAllMessage();
@@ -394,7 +413,7 @@ class BLEConnect implements BLEConnectCallback {
     }
 
     private void postMessageDelayed(int what, long delayMillis) {
-        //LOGUtils.d(TAG + " postMessageDelayed what:" + what + " delayMillis:" + delayMillis);
+//        LOGUtils.d(TAG + " postMessageDelayed what:" + what + " delayMillis:" + delayMillis);
         if (bleConnectHandler != null) {
             bleConnectHandler.removeMessages(what);
             bleConnectHandler.sendEmptyMessageDelayed(what, delayMillis);
@@ -486,6 +505,15 @@ class BLEConnect implements BLEConnectCallback {
                 gatt.disconnect();
             }
         }
+    }
+
+    //设置通知特征值写回应
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor) {
+        if (descriptor != null) {
+            LOGUtils.d(TAG + " onDescriptorWrite  UUID:" + descriptor.getUuid().toString() + " Value:" + ByteUtils.toHexString(descriptor.getValue()));
+        }
+        postMessageDelayed(hanSetNotification, 10);
     }
 
     @Override

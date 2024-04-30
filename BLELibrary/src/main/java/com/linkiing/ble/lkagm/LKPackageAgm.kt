@@ -5,21 +5,46 @@ import com.linkiing.ble.api.BLEManager
 import com.linkiing.ble.api.BLEWriteDataFormat
 import com.linkiing.ble.callback.BLENotificationCallback
 import com.linkiing.ble.log.LOGUtils
-import com.linkiing.ble.utils.BLEConstant
 import com.linkiing.ble.utils.ByteUtils
 import com.linkiing.ble.utils.CRC8
+import kotlin.math.max
 
 /**
  * LK BLE数据包协议
  */
 class LKPackageAgm private constructor() : BLENotificationCallback {
     private var deviceNotificationListenerList = arrayListOf<PackageMontage>()
+    private var agmMaxLength = 512 //协议单帧最大长度
+    private var vendorId = 0xA0 //协议帧头
+    private var startByte = 0xDC
 
     companion object {
+
         @JvmStatic
         val instance: LKPackageAgm by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             LKPackageAgm()
         }
+    }
+
+    init {
+        BLEManager.getInstance().addNotificationCallback(this)
+    }
+
+    /**
+     * 协议单帧最大长度
+     */
+    fun setAgmMaxLength(agmMaxLength: Int): LKPackageAgm {
+        this.agmMaxLength = max(agmMaxLength, 0)
+        return this
+    }
+
+    /**
+     * 协议帧头
+     */
+    fun setVendorIdAndStartByte(vendorId: Int, startByte: Int): LKPackageAgm {
+        this.vendorId = vendorId
+        this.startByte = startByte
+        return this
     }
 
     /**
@@ -31,8 +56,14 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
         deviceNotificationCallback: LkAgmPackageCallback
     ) {
         if (!haveListener(bleDevice, notificationUUID)) {
-            val packageMontage =
-                PackageMontage(bleDevice, notificationUUID, deviceNotificationCallback)
+            val packageMontage = PackageMontage(
+                agmMaxLength,
+                vendorId,
+                startByte,
+                bleDevice,
+                notificationUUID,
+                deviceNotificationCallback
+            )
             deviceNotificationListenerList.add(packageMontage)
         }
     }
@@ -63,18 +94,15 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
      * 发送命令
      */
     fun sendCmdBytes(
-        serviceUUID: String,
-        characteristicUUID: String,
-        cmd: Int,
-        bytes: ByteArray
+        serviceUUID: String, characteristicUUID: String, cmd: Int, bytes: ByteArray
     ): Boolean {
-        if (bytes.size <= BLEConstant.AGM_MAX_LEN) {
+        if (bytes.size <= agmMaxLength) {
             return sendData(serviceUUID, characteristicUUID, false, cmd, bytes)
         } else {
-            for (size in bytes.indices step BLEConstant.AGM_MAX_LEN) {
-                var len: Int = BLEConstant.AGM_MAX_LEN
+            for (size in bytes.indices step agmMaxLength) {
+                var len: Int = agmMaxLength
                 var next = true
-                if (size + BLEConstant.AGM_MAX_LEN >= bytes.size) {
+                if (size + agmMaxLength >= bytes.size) {
                     len = bytes.size - size
                     next = false
                 }
@@ -89,11 +117,7 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
     }
 
     private fun sendData(
-        serviceUUID: String,
-        characteristicUUID: String,
-        next: Boolean,
-        cmd: Int,
-        bytes: ByteArray
+        serviceUUID: String, characteristicUUID: String, next: Boolean, cmd: Int, bytes: ByteArray
     ): Boolean {
         val len = bytes.size + 1
         val data = ByteArray(len)
@@ -103,8 +127,8 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
         val crc = CRC8.getCrc8(data)
 
         val sendData = ByteArray(len + 6)
-        sendData[0] = BLEConstant.VENDOR_ID.toByte()
-        sendData[1] = BLEConstant.START_BYTE.toByte()
+        sendData[0] = vendorId.toByte()
+        sendData[1] = startByte.toByte()
         sendData[2] = if (next) {
             1
         } else {

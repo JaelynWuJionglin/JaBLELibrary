@@ -22,6 +22,7 @@ import com.linkiing.ble.callback.BLEConnectStatusCallback;
 import com.linkiing.ble.callback.BLENotificationCallback;
 import com.linkiing.ble.callback.BLEPermissionCallback;
 import com.linkiing.ble.callback.BLEReadCallback;
+import com.linkiing.ble.callback.BLEReadRssiCallback;
 import com.linkiing.ble.utils.BackstageUtils;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class BLEManager {
     private final CopyOnWriteArrayList<BLENotificationCallback> notificationCallbackList = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<BLEReadCallback> readCallbackList = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<BLEDevice> befConnectDeviceList = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<BLEReadRssiCallback> readRssiCallbackList = new CopyOnWriteArrayList<>();
     private Application context;
     private BluetoothManager mBluetoothManager = null;
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -45,7 +47,8 @@ public class BLEManager {
     private BLEConfig bleConfig = new BLEConfig();
     private long connectOutTime = DEF_CONNECT_OUT_TIME;
 
-    private BLEManager() {}
+    private BLEManager() {
+    }
 
     /**
      * 单利模式（线程安全）
@@ -257,7 +260,22 @@ public class BLEManager {
     }
 
     /**
+     * 是否正在连接设备
+     */
+    public boolean isConnectingDevice(String macAddress) {
+        if (TextUtils.isEmpty(macAddress)) {
+            return false;
+        }
+        BLEDevice device = getBLEDevice(macAddress);
+        if (device == null) {
+            return false;
+        }
+        return device.isConnecting();
+    }
+
+    /**
      * 连接超时时常
+     *
      * @param outTime 大于6*1000
      */
     public BLEManager setConnectOutTime(long outTime) {
@@ -337,9 +355,9 @@ public class BLEManager {
         List<BLEDevice> deviceList = BLEScanner.getInstance().getAllDevList();
         if (!deviceList.isEmpty()) {
             for (int i = 0; i < deviceList.size(); i++) {
-                BLEDevice devices = deviceList.get(i);
-                if (devices.isConnected()) {
-                    devices.disconnect();
+                BLEDevice device = deviceList.get(i);
+                if (device.isConnected() || device.isConnecting()) {
+                    device.disconnect();
                 }
             }
         }
@@ -531,6 +549,26 @@ public class BLEManager {
      */
     public void removeReadCallback(BLEReadCallback readCallback) {
         readCallbackList.remove(readCallback);
+    }
+
+    public CopyOnWriteArrayList<BLEReadRssiCallback> getReadRssiCallbackList() {
+        return readRssiCallbackList;
+    }
+
+    /**
+     * 添加读取数据回调
+     */
+    public void addReadRssiCallback(BLEReadRssiCallback readRssiCallback) {
+        if (!readRssiCallbackList.contains(readRssiCallback)) {
+            readRssiCallbackList.add(readRssiCallback);
+        }
+    }
+
+    /**
+     * 移除读取数据回调
+     */
+    public void removeReadRssiCallback(BLEReadRssiCallback readRssiCallback) {
+        readRssiCallbackList.remove(readRssiCallback);
     }
 
     /**

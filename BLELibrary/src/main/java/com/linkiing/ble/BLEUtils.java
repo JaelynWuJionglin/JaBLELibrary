@@ -24,7 +24,7 @@ public class BLEUtils {
     private final static String Notification_UUID = "00002902-0000-1000-8000-00805f9b34fb";
 
     /**
-     * 计算蓝牙信号强度
+     * 计算蓝牙信号强度等级（0-100，越大表示信号越强）
      * @param rssi 蓝牙信号值
      */
     public static int getRssiLevel(int rssi) {

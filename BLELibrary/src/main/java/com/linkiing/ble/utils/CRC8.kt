@@ -21,7 +21,7 @@ object CRC8 {
                 }
             }
         }
-        LOGUtils.d("getCrc8() ==> ${ByteUtils.toHexString(bytes, ",")}  crc:${crc.toString(16)}")
+        //LOGUtils.d("getCrc8() ==> ${ByteUtils.toHexString(bytes, ",")}  crc:${crc.toString(16)}")
         return crc
     }
 

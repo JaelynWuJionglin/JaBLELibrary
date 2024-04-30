@@ -2,7 +2,6 @@ package com.linkiing.ble.lkagm
 
 import com.linkiing.ble.BLEDevice
 import com.linkiing.ble.log.LOGUtils
-import com.linkiing.ble.utils.BLEConstant
 import com.linkiing.ble.utils.ByteUtils
 import com.linkiing.ble.utils.CRC8
 import java.io.ByteArrayOutputStream
@@ -11,6 +10,9 @@ import java.io.ByteArrayOutputStream
  * 拼包
  */
 internal class PackageMontage constructor(
+    private val agmMaxLength: Int = 512,
+    private val vendorId: Int = 0xA0,
+    private val startByte: Int = 0xDC,
     val bleDevice: BLEDevice,
     val notificationUUID: String,
     private val deviceNotificationCallback: LkAgmPackageCallback
@@ -32,12 +34,12 @@ internal class PackageMontage constructor(
                 //包起始
                 val dataInt = ByteUtils.byteArrayToIntArray(bytes)
                 val ack = dataInt[2]
-                if (dataInt[0] == BLEConstant.VENDOR_ID
-                    && dataInt[1] == BLEConstant.START_BYTE
+                if (dataInt[0] == vendorId
+                    && dataInt[1] == startByte
                     && isAck(ack)
                 ) {
                     packDataLen = ByteUtils.byteArrayToInt(byteArrayOf(bytes[3], bytes[4]))
-                    if (packDataLen <= 0 || packDataLen > BLEConstant.AGM_MAX_LEN) {
+                    if (packDataLen <= 0 || packDataLen > agmMaxLength) {
                         //包错误
                         packUpReset(4)
                         return

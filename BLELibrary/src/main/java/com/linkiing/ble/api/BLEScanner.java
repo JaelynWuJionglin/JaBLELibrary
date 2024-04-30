@@ -21,6 +21,8 @@ import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
 import com.linkiing.ble.utils.BackstageUtils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,11 +34,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @SuppressLint("MissingPermission")
 public class BLEScanner extends ScanCallback implements BackstageUtils.BackstageListener {
     private volatile static BLEScanner instance = null;
+    //相同设备发送间隔
+    private static final long SEND_VALUE_TIME = 500;
     private final CopyOnWriteArrayList<BLEScanDeviceCallback> bleScanDeviceCallbackList = new CopyOnWriteArrayList<>();
     //上一次开始扫描和结束扫描的时间间隔
     private final long MIN_SCAN_TIME = 6 * 1000;
-    //相同设备发送间隔
-    private final long SEND_VALUE_TIME = 500;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -102,17 +104,13 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     }
 
     /**
-     * 设置扫描时间,如果<=0,则为不停止扫描
+     * 设置扫描时间,如果==0,则为不停止扫描
      */
     public BLEScanner setScanTime(long SCAN_TIME) {
-        if (SCAN_TIME <= 0) {
-            isNeedStop = false;
-        } else {
-            isNeedStop = true;
-            if (SCAN_TIME < MIN_SCAN_TIME) {
-                SCAN_TIME = MIN_SCAN_TIME;
-            }
+        if (SCAN_TIME == 0 || SCAN_TIME >= MIN_SCAN_TIME) {
             this.SCAN_TIME = SCAN_TIME;
+        } else {
+            this.SCAN_TIME = MIN_SCAN_TIME;
         }
         return this;
     }
@@ -182,6 +180,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
         if (nowScan) {
             handler.removeCallbacks(runnableStart);
             handler.postDelayed(runnableStart, 200);
+            isNeedStop = true;
         } else {
             if (isScanning) {
                 //正在扫描中，则继续扫描， 不停止。
@@ -189,11 +188,14 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             } else {
                 handler.removeCallbacks(runnableStart);
                 handler.postDelayed(runnableStart, 200);
+                isNeedStop = true;
             }
         }
-        handler.removeCallbacks(runnableStop);
-        handler.postDelayed(runnableStop, SCAN_TIME);
-        isNeedStop = true;
+
+        if (SCAN_TIME != 0 && isNeedStop) {
+            handler.removeCallbacks(runnableStop);
+            handler.postDelayed(runnableStop, SCAN_TIME);
+        }
     }
 
     /**
@@ -227,11 +229,28 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
 
     /**
      * 获取所有扫描到的设备列表，不重复
+     * (包含已经连接的设备)
      *
      * @return deviceList
      */
     public List<BLEDevice> getAllDevList() {
         return deviceList;
+    }
+
+    /**
+     * 获取所有扫描到的设备列表，不重复
+     * （不包含已连接设备）
+     *
+     * @return deviceList
+     */
+    public List<BLEDevice> getAllNotConnectDevList() {
+        List<BLEDevice> list = new ArrayList<>();
+        for (BLEDevice device : deviceList) {
+            if (!device.isConnected()) {
+                list.add(device);
+            }
+        }
+        return list;
     }
 
     /**
@@ -255,11 +274,14 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * @param bleDevice BLEDevice
      */
     public void addBLEDevice(BLEDevice bleDevice) {
-        synchronized (deviceList) {
-            if (bleDevice != null && TextUtils.isEmpty(bleDevice.getDeviceMac())) {
-                if (getBLEDevice(bleDevice.getDeviceMac()) == null) {
-                    deviceList.add(bleDevice);
+        if (bleDevice != null && !TextUtils.isEmpty(bleDevice.getDeviceMac())) {
+            BLEDevice device = getBLEDevice(bleDevice.getDeviceMac());
+            synchronized (deviceList) {
+                if (device != null) {
+                    device.disconnect();
+                    deviceList.remove(device);
                 }
+                deviceList.add(bleDevice);
             }
         }
     }
@@ -271,7 +293,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
         Iterator<BLEDevice> iterator = deviceList.iterator();
         while (iterator.hasNext()) {
             BLEDevice bleDevice = iterator.next();
-            if (!bleDevice.isConnected()) {
+            if (!bleDevice.isConnected() && !bleDevice.isConnecting()) {
                 iterator.remove();
             }
         }
@@ -292,6 +314,10 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
         }
         if (result == null) {
             LOGUtils.e("BLEScanner error! onScanResult result==null");
+            return;
+        }
+        if (result.getScanRecord() == null) {
+            LOGUtils.e("BLEScanner error! onScanResult result.getScanRecord()==null");
             return;
         }
         byte[] scanRecord = result.getScanRecord().getBytes();
@@ -419,7 +445,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      *
      * @param bleDevice BLEDevice
      */
-    private void sendDevData(BLEDevice bleDevice) {
+    private void sendDevData(@NotNull BLEDevice bleDevice) {
         for (BLEScanDeviceCallback scanDeviceCallback : bleScanDeviceCallbackList) {
             if (scanDeviceCallback != null) {
                 scanDeviceCallback.onScanDevice(bleDevice);

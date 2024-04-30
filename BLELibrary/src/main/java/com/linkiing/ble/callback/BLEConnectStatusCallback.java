@@ -2,6 +2,8 @@ package com.linkiing.ble.callback;
 
 import com.linkiing.ble.BLEDevice;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface BLEConnectStatusCallback {
 
    /**
@@ -9,5 +11,5 @@ public interface BLEConnectStatusCallback {
     * @param bleDevice 设备
     * @param connectStatus 连接状态
     */
-   void onBLEConnectStatus(BLEDevice bleDevice, int connectStatus);
+   void onBLEConnectStatus(@NotNull BLEDevice bleDevice, int connectStatus);
 }

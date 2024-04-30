@@ -3,6 +3,7 @@ package com.linkiing.ble;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -243,8 +244,15 @@ class BLECommandPolicy implements BLEWriteCallback {
     }
 
     @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor) {
+        bleCommandPolicyHandler.removeMessages(hanPostOn);
+        postMessage(hanRemove, 0);
+    }
+
+    @Override
     public void onCharacteristicReadCallback(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         bleCommandPolicyHandler.removeMessages(hanPostOn);
         postMessage(hanRemove, 0);
     }
+
 }

@@ -16,14 +16,6 @@ public class BLEConstant {
     public final static String Command_Type_enNotify = "Command_Type_enNotify";//打开通知
     public final static String Command_Type_disNotify = "Command_Type_disNotify";//关闭通知
 
-
-    //协议单帧最大长度
-    public final static int AGM_MAX_LEN = 512;
-
-    //协议帧头
-    public final static int VENDOR_ID = 0xA0;
-    public final static int START_BYTE = 0xDC;
-
     /**
      * 判断数组a是否包数组b
      */
