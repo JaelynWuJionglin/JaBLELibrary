@@ -101,7 +101,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
         if (characteristic != null) {
             String uuid = characteristic.getUuid().toString();
             byte[] bytes = characteristic.getValue();
-            for (BLENotificationCallback notificationCallback : BLEManager.getInstance().getNotificationCallbackList()) {
+            for (BLENotificationCallback notificationCallback : BLECallbackImp.getInstance().getNotificationCallbackList()) {
                 if (notificationCallback != null) {
                     notificationCallback.onNotificationCallback(getCurrentDevice(), uuid, bytes);
                 }
@@ -134,7 +134,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
             if (characteristic != null) {
                 String uuid = characteristic.getUuid().toString();
                 byte[] bytes = characteristic.getValue();
-                for (BLEReadCallback readCallback : BLEManager.getInstance().getReadCallbackList()) {
+                for (BLEReadCallback readCallback : BLECallbackImp.getInstance().getReadCallbackList()) {
                     if (readCallback != null) {
                         readCallback.onReadCallback(getCurrentDevice(), uuid, bytes);
                     }
@@ -154,7 +154,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
             if (!isThisGatt(gatt)) {
                 return;
             }
-            for (BLEReadRssiCallback readRssiCallback : BLEManager.getInstance().getReadRssiCallbackList()) {
+            for (BLEReadRssiCallback readRssiCallback : BLECallbackImp.getInstance().getReadRssiCallbackList()) {
                 if (readRssiCallback != null) {
                     readRssiCallback.onReadRssiCallback(rssi);
                 }

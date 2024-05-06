@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 
+import com.linkiing.ble.BLECallbackImp;
 import com.linkiing.ble.BLEDevice;
 import com.linkiing.ble.NotificationFormat;
 import com.linkiing.ble.callback.BLEConnectStatusCallback;
@@ -34,12 +35,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class BLEManager {
     public static final long DEF_CONNECT_OUT_TIME = 15 * 1000;
-    private volatile static BLEManager instance = null;
-    private final CopyOnWriteArrayList<BLEConnectStatusCallback> bleConnectStatusCallbackList = new CopyOnWriteArrayList<>();
-    private final CopyOnWriteArrayList<BLENotificationCallback> notificationCallbackList = new CopyOnWriteArrayList<>();
-    private final CopyOnWriteArrayList<BLEReadCallback> readCallbackList = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<BLEDevice> befConnectDeviceList = new CopyOnWriteArrayList<>();
-    private final CopyOnWriteArrayList<BLEReadRssiCallback> readRssiCallbackList = new CopyOnWriteArrayList<>();
+    private volatile static BLEManager instance = null;
+    private BLECallbackImp bleCallbackImp;
     private Application context;
     private BluetoothManager mBluetoothManager = null;
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -48,6 +46,7 @@ public class BLEManager {
     private long connectOutTime = DEF_CONNECT_OUT_TIME;
 
     private BLEManager() {
+        bleCallbackImp = BLECallbackImp.getInstance();
     }
 
     /**
@@ -491,16 +490,12 @@ public class BLEManager {
         return this;
     }
 
-    public CopyOnWriteArrayList<BLEConnectStatusCallback> getBleConnectStatusCallbackList() {
-        return bleConnectStatusCallbackList;
-    }
-
     /**
      * 添加设备连接状态监听
      */
     public void addBleConnectStatusCallback(BLEConnectStatusCallback bleConnectStatusCallback) {
-        if (!bleConnectStatusCallbackList.contains(bleConnectStatusCallback)) {
-            bleConnectStatusCallbackList.add(bleConnectStatusCallback);
+        if (!bleCallbackImp.getBleConnectStatusCallbackList().contains(bleConnectStatusCallback)) {
+            bleCallbackImp.getBleConnectStatusCallbackList().add(bleConnectStatusCallback);
         }
     }
 
@@ -508,19 +503,15 @@ public class BLEManager {
      * 移除连接状态监听
      */
     public void removeBleConnectStatusCallback(BLEConnectStatusCallback bleConnectStatusCallback) {
-        bleConnectStatusCallbackList.remove(bleConnectStatusCallback);
-    }
-
-    public CopyOnWriteArrayList<BLENotificationCallback> getNotificationCallbackList() {
-        return notificationCallbackList;
+        bleCallbackImp.getBleConnectStatusCallbackList().remove(bleConnectStatusCallback);
     }
 
     /**
      * 添加通知数据监听
      */
     public void addNotificationCallback(BLENotificationCallback notificationCallback) {
-        if (!notificationCallbackList.contains(notificationCallback)) {
-            notificationCallbackList.add(notificationCallback);
+        if (!bleCallbackImp.getNotificationCallbackList().contains(notificationCallback)) {
+            bleCallbackImp.getNotificationCallbackList().add(notificationCallback);
         }
     }
 
@@ -528,19 +519,15 @@ public class BLEManager {
      * 移除通知数据监听
      */
     public void removeNotificationCallback(BLENotificationCallback notificationCallback) {
-        notificationCallbackList.remove(notificationCallback);
-    }
-
-    public CopyOnWriteArrayList<BLEReadCallback> getReadCallbackList() {
-        return readCallbackList;
+        bleCallbackImp.getNotificationCallbackList().remove(notificationCallback);
     }
 
     /**
      * 添加读取数据回调
      */
     public void addReadCallback(BLEReadCallback readCallback) {
-        if (!readCallbackList.contains(readCallback)) {
-            readCallbackList.add(readCallback);
+        if (!bleCallbackImp.getReadCallbackList().contains(readCallback)) {
+            bleCallbackImp.getReadCallbackList().add(readCallback);
         }
     }
 
@@ -548,19 +535,15 @@ public class BLEManager {
      * 移除读取数据回调
      */
     public void removeReadCallback(BLEReadCallback readCallback) {
-        readCallbackList.remove(readCallback);
-    }
-
-    public CopyOnWriteArrayList<BLEReadRssiCallback> getReadRssiCallbackList() {
-        return readRssiCallbackList;
+        bleCallbackImp.getReadCallbackList().remove(readCallback);
     }
 
     /**
      * 添加读取数据回调
      */
     public void addReadRssiCallback(BLEReadRssiCallback readRssiCallback) {
-        if (!readRssiCallbackList.contains(readRssiCallback)) {
-            readRssiCallbackList.add(readRssiCallback);
+        if (!bleCallbackImp.getReadRssiCallbackList().contains(readRssiCallback)) {
+            bleCallbackImp.getReadRssiCallbackList().add(readRssiCallback);
         }
     }
 
@@ -568,15 +551,13 @@ public class BLEManager {
      * 移除读取数据回调
      */
     public void removeReadRssiCallback(BLEReadRssiCallback readRssiCallback) {
-        readRssiCallbackList.remove(readRssiCallback);
+        bleCallbackImp.getReadRssiCallbackList().remove(readRssiCallback);
     }
 
     /**
      * clear
      */
     public void clear() {
-        bleConnectStatusCallbackList.clear();
-        notificationCallbackList.clear();
-        readCallbackList.clear();
+        BLECallbackImp.getInstance().clear();
     }
 }

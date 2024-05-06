@@ -432,7 +432,7 @@ class BLEConnect implements BLEConnectCallback {
 
     private void postConnectStatus(int connectStatus) {
         LOGUtils.d(TAG + " postConnectStatus connectStatus:" + connectStatus);
-        for (BLEConnectStatusCallback callback : bleManager.getBleConnectStatusCallbackList()) {
+        for (BLEConnectStatusCallback callback : BLECallbackImp.getInstance().getBleConnectStatusCallbackList()) {
             if (callback != null && bleDevice != null) {
                 callback.onBLEConnectStatus(bleDevice, connectStatus);
             }
@@ -516,6 +516,10 @@ class BLEConnect implements BLEConnectCallback {
         postMessageDelayed(hanSetNotification, 10);
     }
 
+    /**
+     * mtu 范围在23 ~ 517之间
+     * 蓝牙一般默认支持的MTU长度是23个字节，一个字节为类型操作码，两个字节为类型操作句柄，实际传输数据就是20字节。
+     */
     @Override
     public void onBLEMtuChanged(int mtu, int status) {
         LOGUtils.v(TAG + " onBLEMtuChanged status:" + status + "  mtu:" + mtu);
