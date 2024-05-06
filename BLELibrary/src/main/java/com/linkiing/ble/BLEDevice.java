@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 
+import androidx.annotation.NonNull;
+
 import com.linkiing.ble.api.BLENotifyDataFormat;
 import com.linkiing.ble.api.BLEReadDataFormat;
 import com.linkiing.ble.api.BLEWriteDataFormat;
@@ -82,6 +84,7 @@ public class BLEDevice extends IBluetoothGattCallback {
         this.bluetoothGatt = bluetoothGatt;
     }
 
+    @NonNull
     @Override
     protected BLEDevice getCurrentDevice() {
         return this;

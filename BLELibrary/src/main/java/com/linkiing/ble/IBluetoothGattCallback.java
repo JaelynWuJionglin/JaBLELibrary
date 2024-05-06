@@ -12,6 +12,10 @@ import com.linkiing.ble.callback.BLEReadCallback;
 import com.linkiing.ble.callback.BLEReadRssiCallback;
 import com.linkiing.ble.log.LOGUtils;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
+
 /**
  * BluetoothGattCallback
  */
@@ -23,6 +27,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     /**
      * 获取当前设备
      */
+    @NotNull
     protected abstract BLEDevice getCurrentDevice();
 
     private boolean isThisGatt(BluetoothGatt gatt) {
@@ -99,11 +104,12 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
             return;
         }
         if (characteristic != null) {
-            String uuid = characteristic.getUuid().toString();
+            UUID uuid = characteristic.getUuid();
+            String uuidStr = uuid != null ? uuid.toString() : null;
             byte[] bytes = characteristic.getValue();
             for (BLENotificationCallback notificationCallback : BLECallbackImp.getInstance().getNotificationCallbackList()) {
-                if (notificationCallback != null) {
-                    notificationCallback.onNotificationCallback(getCurrentDevice(), uuid, bytes);
+                if (notificationCallback != null && uuidStr != null) {
+                    notificationCallback.onNotificationCallback(getCurrentDevice(), uuidStr, bytes);
                 }
             }
         }
@@ -132,11 +138,12 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
                 return;
             }
             if (characteristic != null) {
-                String uuid = characteristic.getUuid().toString();
+                UUID uuid = characteristic.getUuid();
+                String uuidStr = uuid != null ? uuid.toString() : null;
                 byte[] bytes = characteristic.getValue();
                 for (BLEReadCallback readCallback : BLECallbackImp.getInstance().getReadCallbackList()) {
-                    if (readCallback != null) {
-                        readCallback.onReadCallback(getCurrentDevice(), uuid, bytes);
+                    if (readCallback != null && uuidStr != null && bytes != null) {
+                        readCallback.onReadCallback(getCurrentDevice(), uuidStr, bytes);
                     }
                 }
             }
@@ -156,7 +163,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
             }
             for (BLEReadRssiCallback readRssiCallback : BLECallbackImp.getInstance().getReadRssiCallbackList()) {
                 if (readRssiCallback != null) {
-                    readRssiCallback.onReadRssiCallback(rssi);
+                    readRssiCallback.onReadRssiCallback(getCurrentDevice(), rssi);
                 }
             }
         }

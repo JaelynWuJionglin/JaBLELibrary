@@ -3,6 +3,8 @@ package com.linkiing.ble.callback;
 
 import com.linkiing.ble.BLEDevice;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * 通知
  */
@@ -14,5 +16,5 @@ public interface BLENotificationCallback {
      * @param uuid 通道uuid
      * @param bytes 数据
      */
-    void onNotificationCallback(BLEDevice bleDevice, String uuid, byte[] bytes);
+    void onNotificationCallback(@NotNull BLEDevice bleDevice, @NotNull String uuid, @NotNull byte[] bytes);
 }

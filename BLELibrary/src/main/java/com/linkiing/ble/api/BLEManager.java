@@ -458,6 +458,34 @@ public class BLEManager {
     }
 
     /**
+     * 读取设备信号强度
+     * @param macAddress       发送数据到设备的mac地址
+     */
+    public boolean readRssi(String macAddress) {
+        if (TextUtils.isEmpty(macAddress)) {
+            return false;
+        }
+        BLEDevice device = getBLEDevice(macAddress);
+        if (device == null) {
+            return false;
+        }
+        if (device.isConnected()) {
+            return device.readRssi();
+        }
+        return false;
+    }
+
+    /**
+     * 读取已经连接设备的信号强度
+     */
+    public void readRssiToConnect() {
+        List<BLEDevice> connectList = getConnectDevice();
+        for (BLEDevice bleDevice : connectList) {
+            bleDevice.readRssi();
+        }
+    }
+
+    /**
      * 停止发送并清空命令队列
      */
     public void stopSendAndClear(String macAddress) {

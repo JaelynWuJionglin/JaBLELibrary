@@ -154,10 +154,7 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
     /**
      * onNotificationCallback
      */
-    override fun onNotificationCallback(bleDevice: BLEDevice?, uuid: String?, bytes: ByteArray?) {
-        if (bleDevice == null || uuid == null || bytes == null) {
-            return
-        }
+    override fun onNotificationCallback(bleDevice: BLEDevice, uuid: String, bytes: ByteArray) {
         LOGUtils.i("BLE NOT ==> uuid:$uuid bytes:${ByteUtils.toHexString(bytes, ",")}")
 
         for (listener in deviceNotificationListenerList) {
