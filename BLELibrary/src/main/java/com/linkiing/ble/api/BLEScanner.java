@@ -177,19 +177,15 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
 
         devListClear();
         isStart = true;
-        if (nowScan) {
-            handler.removeCallbacks(runnableStart);
-            handler.postDelayed(runnableStart, 200);
-            isNeedStop = true;
+        if (!nowScan && isScanning) {
+            //正在扫描中，则继续扫描， 不停止。
+            isNeedStop = false;
         } else {
-            if (isScanning) {
-                //正在扫描中，则继续扫描， 不停止。
-                isNeedStop = false;
-            } else {
-                handler.removeCallbacks(runnableStart);
-                handler.postDelayed(runnableStart, 200);
-                isNeedStop = true;
-            }
+            long delayedTime = MIN_SCAN_TIME - (System.currentTimeMillis() - startTime);
+            LOGUtils.v("==============> delayedTime:" + delayedTime);
+            handler.removeCallbacks(runnableStart);
+            handler.postDelayed(runnableStart, Math.max(200, delayedTime));
+            isNeedStop = true;
         }
 
         if (SCAN_TIME != 0 && isNeedStop) {
@@ -202,29 +198,15 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * 结束扫描设备
      */
     public void stopScan() {
-        stopScan(2);
+        stopScan(1, false);
     }
 
-    private void stopScan(int code) {
-        LOGUtils.d("stopScan()  isScanning:" + isScanning + "  code:" + code);
-        isStart = false;
-        handler.removeCallbacks(runnableStart);
-        handler.removeCallbacks(runnableStop);
-        if (mBluetoothAdapter == null) {
-            return;
-        }
-        if (!mBluetoothAdapter.isEnabled()) {
-            return;
-        }
-        if (isScanning) {
-            long delayedTime = MIN_SCAN_TIME - (System.currentTimeMillis() - startTime);
-            if (delayedTime > 0) {
-                isNeedStop = true;
-                handler.postDelayed(runnableStop, delayedTime + 100);
-            } else {
-                isScan(false, 0);
-            }
-        }
+    /**
+     * stopAndClear
+     */
+    public void stopAndClear() {
+        stopScan(2, false);
+        devListClear();
     }
 
     /**
@@ -275,11 +257,17 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      */
     public void addBLEDevice(BLEDevice bleDevice) {
         if (bleDevice != null && !TextUtils.isEmpty(bleDevice.getDeviceMac())) {
-            BLEDevice device = getBLEDevice(bleDevice.getDeviceMac());
             synchronized (deviceList) {
-                if (device != null) {
-                    device.disconnect();
-                    deviceList.remove(device);
+                Iterator<BLEDevice> iterator = deviceList.iterator();
+                while (iterator.hasNext()) {
+                    BLEDevice bean = iterator.next();
+                    if (bean != null
+                            && !TextUtils.isEmpty(bean.getDeviceMac())
+                            && bean.getDeviceMac().equals(bleDevice.getDeviceMac())) {
+                        iterator.remove();
+
+                        break;
+                    }
                 }
                 deviceList.add(bleDevice);
             }
@@ -299,12 +287,30 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
         }
     }
 
-    /**
-     * stopAndClear
-     */
-    public void stopAndClear() {
-        stopScan(0);
-        devListClear();
+    private void stopScan(int code, boolean isNow) {
+        LOGUtils.d("stopScan()  isScanning:" + isScanning + "  isNow:" + isNow + "  code:" + code);
+        isStart = false;
+        handler.removeCallbacks(runnableStart);
+        handler.removeCallbacks(runnableStop);
+        if (mBluetoothAdapter == null) {
+            return;
+        }
+        if (!mBluetoothAdapter.isEnabled()) {
+            return;
+        }
+        if (isNow) {
+            isScan(false, 0);
+        } else {
+            if (isScanning) {
+                long delayedTime = MIN_SCAN_TIME - (System.currentTimeMillis() - startTime);
+                if (delayedTime > 0) {
+                    isNeedStop = true;
+                    handler.postDelayed(runnableStop, delayedTime + 100);
+                } else {
+                    isScan(false, 1);
+                }
+            }
+        }
     }
 
     @Override
@@ -380,10 +386,12 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     @Override
     public void onScanFailed(int errorCode) {
         super.onScanFailed(errorCode);
+        LOGUtils.e("BLEScanner error! onScanFailed errorCode = " + errorCode);
         if (errorCode == ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED) {
             LOGUtils.e("Error！扫描过于频繁。");
-        } else {
-            LOGUtils.e("BLEScanner error! onScanFailed errorCode = " + errorCode);
+        } else if (errorCode == ScanCallback.SCAN_FAILED_ALREADY_STARTED) {
+            isScan(false, 2);
+            startScan(false);
         }
     }
 
@@ -460,7 +468,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     private final Runnable runnableStop = () -> {
         LOGUtils.d("BLEScanner runnableStop  isNeedStop:" + isNeedStop);
         if (isNeedStop) {
-            isScan(false, 1);
+            isScan(false, 3);
             for (BLEScanDeviceCallback scanDeviceCallback : bleScanDeviceCallbackList) {
                 if (scanDeviceCallback != null) {
                     scanDeviceCallback.onScanStop();
@@ -474,7 +482,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      */
     private final Runnable runnableStart = () -> {
         if (isStart) {
-            isScan(true, 2);
+            isScan(true, 4);
         }
     };
 
@@ -548,7 +556,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             //App退到后台，停止搜索设备
             backstageChangeScanning = isScanning;
             if (isScanning) {
-                stopScan(1);
+                stopScan(3, false);
                 isBackstageStop = true;
             }
         } else {

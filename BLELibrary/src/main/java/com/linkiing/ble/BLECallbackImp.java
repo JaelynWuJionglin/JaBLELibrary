@@ -2,6 +2,7 @@ package com.linkiing.ble;
 
 import com.linkiing.ble.callback.BLEConnectStatusCallback;
 import com.linkiing.ble.callback.BLENotificationCallback;
+import com.linkiing.ble.callback.BLEOnOffStatusCallback;
 import com.linkiing.ble.callback.BLEReadCallback;
 import com.linkiing.ble.callback.BLEReadRssiCallback;
 
@@ -9,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BLECallbackImp {
    private volatile static BLECallbackImp instance = null;
+   private final CopyOnWriteArrayList<BLEOnOffStatusCallback> bleOnOffStatusCallbackList = new CopyOnWriteArrayList<>();
    private final CopyOnWriteArrayList<BLEConnectStatusCallback> bleConnectStatusCallbackList = new CopyOnWriteArrayList<>();
    private final CopyOnWriteArrayList<BLENotificationCallback> notificationCallbackList = new CopyOnWriteArrayList<>();
    private final CopyOnWriteArrayList<BLEReadCallback> readCallbackList = new CopyOnWriteArrayList<>();
@@ -24,6 +26,10 @@ public class BLECallbackImp {
          instance = new BLECallbackImp();
       }
       return instance;
+   }
+
+   public CopyOnWriteArrayList<BLEOnOffStatusCallback> getBleOnOffStatusCallbackList() {
+      return bleOnOffStatusCallbackList;
    }
 
    public CopyOnWriteArrayList<BLEConnectStatusCallback> getBleConnectStatusCallbackList() {

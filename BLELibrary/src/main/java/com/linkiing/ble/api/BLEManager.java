@@ -21,9 +21,12 @@ import com.linkiing.ble.BLEDevice;
 import com.linkiing.ble.NotificationFormat;
 import com.linkiing.ble.callback.BLEConnectStatusCallback;
 import com.linkiing.ble.callback.BLENotificationCallback;
+import com.linkiing.ble.callback.BLEOnOffStatusCallback;
 import com.linkiing.ble.callback.BLEPermissionCallback;
 import com.linkiing.ble.callback.BLEReadCallback;
 import com.linkiing.ble.callback.BLEReadRssiCallback;
+import com.linkiing.ble.log.LOGUtils;
+import com.linkiing.ble.receiver.BluetoothReceiver;
 import com.linkiing.ble.utils.BackstageUtils;
 
 import java.util.ArrayList;
@@ -38,12 +41,14 @@ public class BLEManager {
     private final CopyOnWriteArrayList<BLEDevice> befConnectDeviceList = new CopyOnWriteArrayList<>();
     private volatile static BLEManager instance = null;
     private BLECallbackImp bleCallbackImp;
+    private BluetoothReceiver bluetoothReceiver;
     private Application context;
     private BluetoothManager mBluetoothManager = null;
     private BluetoothAdapter mBluetoothAdapter = null;
     private List<NotificationFormat> notificationFormatList;
     private BLEConfig bleConfig = new BLEConfig();
     private long connectOutTime = DEF_CONNECT_OUT_TIME;
+    private String connectDeviceName = "";
 
     private BLEManager() {
         bleCallbackImp = BLECallbackImp.getInstance();
@@ -83,6 +88,11 @@ public class BLEManager {
         this.context = context;
         mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         BackstageUtils.getInstance().init(context);
+
+        if (bluetoothReceiver == null) {
+            bluetoothReceiver = new BluetoothReceiver();
+            bluetoothReceiver.registerBluetoothReceiver(context);
+        }
     }
 
     /**
@@ -107,6 +117,7 @@ public class BLEManager {
     public boolean isBleOpen() {
         BluetoothAdapter adapter = getBluetoothAdapter();
         if (adapter == null) {
+            LOGUtils.w("BLEManager ble not open");
             return false;
         }
         return adapter.isEnabled();
@@ -315,12 +326,24 @@ public class BLEManager {
     }
 
     /**
+     * 给连接的设备设置设备名
+     * （在使用《connectDevice(String macAddress)》连接设备的时候，可能会获取不到设备名，可用这个方法将已知的设备名设置给BLEDevice）
+     */
+    public BLEManager setConnectDeviceName(String connectDeviceName) {
+        if (!TextUtils.isEmpty(connectDeviceName)) {
+            this.connectDeviceName = connectDeviceName;
+        }
+        return this;
+    }
+
+    /**
      * 连接设备
      */
     public boolean connectDevice(String macAddress) {
         if (TextUtils.isEmpty(macAddress)) {
             return false;
         }
+
         BLEDevice bleDevice = getBLEDevice(macAddress);
         if (bleDevice == null) {
             BluetoothDevice bluetoothDevice = getBluetoothAdapter().getRemoteDevice(macAddress);
@@ -329,6 +352,9 @@ public class BLEManager {
             }
             bleDevice = new BLEDevice();
             bleDevice.setData(bluetoothDevice, new byte[0], 0);
+            if (!TextUtils.isEmpty(connectDeviceName)) {
+                bleDevice.setDeviceName(connectDeviceName);
+            }
         }
         return connectDevice(bleDevice);
     }
@@ -459,7 +485,8 @@ public class BLEManager {
 
     /**
      * 读取设备信号强度
-     * @param macAddress       发送数据到设备的mac地址
+     *
+     * @param macAddress 发送数据到设备的mac地址
      */
     public boolean readRssi(String macAddress) {
         if (TextUtils.isEmpty(macAddress)) {
@@ -516,6 +543,22 @@ public class BLEManager {
     public BLEManager setNotificationList(List<NotificationFormat> notificationFormatList) {
         this.notificationFormatList = notificationFormatList;
         return this;
+    }
+
+    /**
+     * 添加手机蓝牙开启关闭监听
+     */
+    public void addBleOnOffStatusCallback(BLEOnOffStatusCallback bleOnOffStatusCallback) {
+        if (!bleCallbackImp.getBleOnOffStatusCallbackList().contains(bleOnOffStatusCallback)) {
+            bleCallbackImp.getBleOnOffStatusCallbackList().add(bleOnOffStatusCallback);
+        }
+    }
+
+    /**
+     * 移除手机蓝牙开启关闭监听
+     */
+    public void removeBleOnOffStatusCallback(BLEOnOffStatusCallback bleOnOffStatusCallback) {
+        bleCallbackImp.getBleOnOffStatusCallbackList().remove(bleOnOffStatusCallback);
     }
 
     /**

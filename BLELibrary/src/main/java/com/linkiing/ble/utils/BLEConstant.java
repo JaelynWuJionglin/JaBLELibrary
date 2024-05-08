@@ -10,6 +10,8 @@ public class BLEConstant {
     public final static int BLE_STATUS_DISCONNECTED = 2;// 设备连接断开
     public final static int BLE_STATUS_CONNECT_TIME_OUT = 3;// 设备连接超时
     public final static int BLE_STATUS_CONNECT_FAIL = 4;// 设备连接失败
+    public final static int BLE_STATUS_STATE_ON = 5;//蓝牙打开
+    public final static int BLE_STATUS_STATE_OFF = 6;//蓝牙关闭
 
     public final static String Command_Type_write = "Command_Type_write";//写
     public final static String Command_Type_read = "Command_Type_read";//读

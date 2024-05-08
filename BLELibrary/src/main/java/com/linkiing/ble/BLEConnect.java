@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
@@ -144,30 +145,57 @@ class BLEConnect implements BLEConnectCallback {
      */
     @Override
     public synchronized boolean connect(BLEDevice bleDevice) {
-        this.bleDevice = bleDevice;
-
         if (bleDevice == null) {
-            LOGUtils.e(TAG + " connect() device==null");
+            LOGUtils.e(TAG + " connect() device == null");
             return false;
         }
 
-        if (BLEUtils.isBLEConnect(bleDevice.getDevice())) {
-            LOGUtils.e(TAG + " connect() isConnect() = true");
+        if (bleDevice.getDevice() == null) {
+            LOGUtils.e(TAG + " connect() bleDevice.getDevice() == null");
             return false;
-        } else {
-            isConnected = false;
         }
+
+        if (TextUtils.isEmpty(bleDevice.getDeviceMac())) {
+            LOGUtils.e(TAG + " connect() DeviceMac isEmpty");
+            return false;
+        }
+
+        if (!BLEManager.getInstance().isBleOpen()){
+            return false;
+        }
+
+        if (bleDevice.getDeviceName() == null) {
+            bleDevice.setDeviceName("");
+        }
+
+        this.bleDevice = bleDevice;
+        LOGUtils.d(TAG + " connect() DeviceName:" + bleDevice.getDeviceName() + "  DeviceMac:" + bleDevice.getDeviceMac());
 
         int size = bleManager.getConnectDevice().size();
         if (size >= getMaxConnectNumber()) {
             LOGUtils.e(TAG + " getConnectDevice().size() >= getMaxConnectNumber()!  size:" + size);
+            if (isConnected) {
+                LOGUtils.i(TAG + " connect() isConnected = true");
+                bleDisconnect(8);
+            }
             return false;
         }
 
+        if (isConnecting) {
+            LOGUtils.i(TAG + " connect() isConnecting = true");
+            return false;
+        }
         isConnecting = true;
 
         long delayTime;
         synchronized (BLUETOOTH_GATT_LOCK) {
+            removeAllMessage();
+
+            if (isConnected) {
+                LOGUtils.i(TAG + " connect() isConnected = true");
+                isConnected = false;
+            }
+
             if (bluetoothGatt != null) {
                 //连接之前先释放资源
                 belGattClose(0);
@@ -479,7 +507,7 @@ class BLEConnect implements BLEConnectCallback {
                     postMessageDelayed(hanConnect, 3000);
                 } else {
                     gatt.close();
-                    postMessageDelayed(hanDisconnect, 3000);
+                    postMessageDelayed(hanDisconnect, 10);
                 }
                 break;
             case BluetoothProfile.STATE_CONNECTED:

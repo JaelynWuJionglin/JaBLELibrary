@@ -115,7 +115,7 @@ public class BLEUtils {
      * @param device 蓝牙设备对象
      */
     @SuppressLint("MissingPermission")
-    public static boolean isBLEConnect(BluetoothDevice device) {
+    public static boolean isBLEConnected(BluetoothDevice device) {
         if (device == null) {
             LOGUtils.e("BLEDevices isConnect() device==null");
             return false;
@@ -123,7 +123,7 @@ public class BLEUtils {
         BluetoothManager mBluetoothManager = BLEManager.getInstance().getBluetoothManager();
         if (mBluetoothManager != null) {
             int status = mBluetoothManager.getConnectionState(device, BluetoothProfile.GATT);
-            //LOGUtils.i( "isConnect ConnectState : " + stuat);
+            LOGUtils.d( "isConnect ConnectState : " + status);
             return status == BluetoothAdapter.STATE_CONNECTED
                     || status == BluetoothAdapter.STATE_CONNECTING;
         }

@@ -3,12 +3,15 @@ package com.linkiing.ble;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
 import com.linkiing.ble.api.BLENotifyDataFormat;
 import com.linkiing.ble.api.BLEReadDataFormat;
 import com.linkiing.ble.api.BLEWriteDataFormat;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -18,21 +21,20 @@ import java.util.List;
 @SuppressLint("MissingPermission")
 public class BLEDevice extends IBluetoothGattCallback {
     private BluetoothDevice device = null;
-    private BluetoothGatt bluetoothGatt = null;
     private String deviceName = "";
     private String deviceMac = "";
     private byte[] scanRecord = null;
     private int rssi = -1;
 
-    public void setData(BluetoothDevice device, byte[] scanRecord, int rssi) {
+    public void setData(@NonNull BluetoothDevice device, @NonNull byte[] scanRecord, int rssi) {
         this.device = device;
-        this.deviceName = device.getName();
-        this.deviceMac = device.getAddress();
+        this.deviceName = device.getName() != null ? device.getName() : "";
+        this.deviceMac = device.getAddress() != null ? device.getAddress() : "";
         this.scanRecord = scanRecord;
         this.rssi = rssi;
     }
 
-    public void setDevice(BluetoothDevice device) {
+    public void setDevice(@NonNull BluetoothDevice device) {
         this.device = device;
     }
 
@@ -45,7 +47,7 @@ public class BLEDevice extends IBluetoothGattCallback {
     }
 
     public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
+        this.deviceName = deviceName != null ? deviceName : "";
     }
 
     public String getDeviceMac() {
@@ -53,7 +55,7 @@ public class BLEDevice extends IBluetoothGattCallback {
     }
 
     public void setDeviceMac(String deviceMac) {
-        this.deviceMac = deviceMac;
+        this.deviceMac = deviceMac != null ? deviceMac : "";
     }
 
     public byte[] getScanRecord() {
@@ -74,14 +76,6 @@ public class BLEDevice extends IBluetoothGattCallback {
 
     public int getRssiLevel() {
         return BLEUtils.getRssiLevel(rssi);
-    }
-
-    public BluetoothGatt getBluetoothGatt() {
-        return bluetoothGatt;
-    }
-
-    public void setBluetoothGatt(BluetoothGatt bluetoothGatt) {
-        this.bluetoothGatt = bluetoothGatt;
     }
 
     @NonNull
