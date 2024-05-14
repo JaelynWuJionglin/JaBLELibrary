@@ -38,7 +38,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class BLEManager {
     public static final long DEF_CONNECT_OUT_TIME = 15 * 1000;
-    private final CopyOnWriteArrayList<BLEDevice> befConnectDeviceList = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<BLEDevice> bleConnectDeviceList = new CopyOnWriteArrayList<>();
     private volatile static BLEManager instance = null;
     private BLECallbackImp bleCallbackImp;
     private BluetoothReceiver bluetoothReceiver;
@@ -302,11 +302,11 @@ public class BLEManager {
         }
 
         //清除已断开设备的gatt
-        for (int i = 0; i < befConnectDeviceList.size(); i++) {
-            BLEDevice dev = befConnectDeviceList.get(i);
+        for (int i = 0; i < bleConnectDeviceList.size(); i++) {
+            BLEDevice dev = bleConnectDeviceList.get(i);
             if (dev != null && !isConnectDevice(dev.getDeviceMac())) {
-                dev.gattClose();
-                befConnectDeviceList.remove(dev);
+                dev.disconnect();
+                bleConnectDeviceList.remove(dev);
             }
         }
 
@@ -316,7 +316,7 @@ public class BLEManager {
         }
         bleDevice.setConnectOutTime(connectOutTime);
         if (bleDevice.connect()) {
-            befConnectDeviceList.add(bleDevice);
+            bleConnectDeviceList.add(bleDevice);
             connectOutTime = DEF_CONNECT_OUT_TIME;
             return true;
         } else {

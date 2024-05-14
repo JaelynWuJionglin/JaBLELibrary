@@ -94,7 +94,11 @@ public class BLEPermissionsUtils {
      */
     private static boolean checkBleAndGps(Activity activity, BLEPermissionCallback belPermissionCallback) {
         if (BLEManager.getInstance().isBleOpen()) {
-            if (checkGps) {
+            if (!checkGps && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                //安卓12及以上，蓝牙不需要定位。
+                //checkGps 是为了app有其他定位需求，在这里可以一起申请打开。
+                return true;
+            } else {
                 return BLEManager.getInstance().openGPSSettings(
                         activity,
                         titleTextId,
@@ -102,8 +106,6 @@ public class BLEPermissionsUtils {
                         confirmTextId,
                         cancelTextId,
                         belPermissionCallback);
-            } else {
-                return true;
             }
         } else {
             BLEManager.getInstance().sysOpenBLE(activity);

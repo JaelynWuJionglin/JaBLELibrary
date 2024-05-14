@@ -13,6 +13,7 @@ import com.linkiing.ble.api.BLEWriteDataFormat;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +26,7 @@ public class BLEDevice extends IBluetoothGattCallback {
     private String deviceMac = "";
     private byte[] scanRecord = null;
     private int rssi = -1;
+    private final List<Integer> rssiList = new ArrayList<>();
 
     public void setData(@NonNull BluetoothDevice device, @NonNull byte[] scanRecord, int rssi) {
         this.device = device;
@@ -32,6 +34,7 @@ public class BLEDevice extends IBluetoothGattCallback {
         this.deviceMac = device.getAddress() != null ? device.getAddress() : "";
         this.scanRecord = scanRecord;
         this.rssi = rssi;
+        addRssi(rssi);
     }
 
     public void setDevice(@NonNull BluetoothDevice device) {
@@ -72,6 +75,20 @@ public class BLEDevice extends IBluetoothGattCallback {
 
     public void setRssi(int rssi) {
         this.rssi = rssi;
+        addRssi(rssi);
+    }
+
+    public List<Integer> getRssiList() {
+        return rssiList;
+    }
+
+    private void addRssi(int rssi) {
+        synchronized (rssiList) {
+            rssiList.add(rssi);
+            if (rssiList.size() > 30) {
+                rssiList.remove(0);
+            }
+        }
     }
 
     public int getRssiLevel() {
@@ -109,7 +126,7 @@ public class BLEDevice extends IBluetoothGattCallback {
     /**
      * 设置连接超时时间
      */
-    public BLEDevice setConnectOutTime(long outTime){
+    public BLEDevice setConnectOutTime(long outTime) {
         bleConnect.setConnectOutTime(outTime);
         return this;
     }
@@ -123,13 +140,6 @@ public class BLEDevice extends IBluetoothGattCallback {
 
     public boolean readRssi() {
         return bleConnect.readRssi();
-    }
-
-    /**
-     * gattClose
-     */
-    public void gattClose() {
-        bleConnect.gattClose();
     }
 
     /**

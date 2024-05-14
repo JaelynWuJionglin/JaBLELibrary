@@ -252,16 +252,6 @@ class BLEConnect implements BLEConnectCallback {
         }
     }
 
-    @Override
-    public void gattClose() {
-        synchronized (BLUETOOTH_GATT_LOCK) {
-            if (bluetoothGatt != null) {
-                refreshCache();
-            }
-            belGattClose(1);
-        }
-    }
-
     private boolean bleDisconnect(int disCode) {
         LOGUtils.d(TAG + " bleDisconnect() disCode:" + disCode);
         synchronized (BLUETOOTH_GATT_LOCK) {
@@ -501,7 +491,7 @@ class BLEConnect implements BLEConnectCallback {
         switch (newState) {
             case BluetoothProfile.STATE_DISCONNECTED:
                 isConnected = false;
-                belGattClose(2);
+                belGattClose(1);
                 if (isConnecting) {
                     //重连设备
                     postMessageDelayed(hanConnect, 3000);

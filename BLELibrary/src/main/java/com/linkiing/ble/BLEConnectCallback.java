@@ -103,9 +103,4 @@ interface BLEConnectCallback {
      * @return true:执行成功  false:执行出错
      */
     boolean disconnect();
-
-    /**
-     * gattClose
-     */
-    void gattClose();
 }
