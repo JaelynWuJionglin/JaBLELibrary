@@ -29,11 +29,11 @@ android {
     }
 
     //aar重名了
-    android.libraryVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "BLELibrary_v${project.versionName}.aar"
-        }
-    }
+//    android.libraryVariants.all { variant ->
+//        variant.outputs.all {
+//            outputFileName = "BLELibrary_v${project.versionName}.aar"
+//        }
+//    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
