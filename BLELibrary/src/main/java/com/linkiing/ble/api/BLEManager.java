@@ -351,7 +351,7 @@ public class BLEManager {
                 return false;
             }
             bleDevice = new BLEDevice();
-            bleDevice.setData(bluetoothDevice, new byte[0], 0);
+            bleDevice.setData(bluetoothDevice, new byte[0], null, 0);
             if (!TextUtils.isEmpty(connectDeviceName)) {
                 bleDevice.setDeviceName(connectDeviceName);
             }

@@ -3,6 +3,7 @@ package com.linkiing.ble;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.os.ParcelUuid;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -24,16 +25,18 @@ public class BLEDevice extends IBluetoothGattCallback {
     private BluetoothDevice device = null;
     private String deviceName = "";
     private String deviceMac = "";
-    private byte[] scanRecord = null;
+    private byte[] scanRecord = new byte[0];
+    private List<ParcelUuid> parcelUuids = new ArrayList<>();
     private int rssi = -1;
     private final List<Integer> rssiList = new ArrayList<>();
 
-    public void setData(@NonNull BluetoothDevice device, @NonNull byte[] scanRecord, int rssi) {
-        this.device = device;
+    public void setData(@NonNull BluetoothDevice device, @NonNull byte[] scanRecord, List<ParcelUuid> parcelUuids, int rssi) {
         this.deviceName = device.getName() != null ? device.getName() : "";
         this.deviceMac = device.getAddress() != null ? device.getAddress() : "";
-        this.scanRecord = scanRecord;
-        this.rssi = rssi;
+        setDevice(device);
+        setScanRecord(scanRecord);
+        setParcelUuids(parcelUuids);
+        setRssi(rssi);
         addRssi(rssi);
     }
 
@@ -66,7 +69,23 @@ public class BLEDevice extends IBluetoothGattCallback {
     }
 
     public void setScanRecord(byte[] scanRecord) {
-        this.scanRecord = scanRecord;
+        if (scanRecord == null) {
+            this.scanRecord = new byte[0];
+        } else {
+            this.scanRecord = scanRecord;
+        }
+    }
+
+    public void setParcelUuids(List<ParcelUuid> parcelUuids) {
+        if (parcelUuids == null) {
+            this.parcelUuids = new ArrayList<>();
+        } else {
+            this.parcelUuids = parcelUuids;
+        }
+    }
+
+    public List<ParcelUuid> getParcelUuids() {
+        return parcelUuids;
     }
 
     public int getRssi() {

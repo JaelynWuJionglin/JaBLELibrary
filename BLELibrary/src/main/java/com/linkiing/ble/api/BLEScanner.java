@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanSettings;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.ParcelUuid;
 import android.text.TextUtils;
 
 import com.linkiing.ble.BLEDevice;
@@ -20,12 +21,15 @@ import com.linkiing.ble.callback.BLEScannerFilterCallback;
 import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
 import com.linkiing.ble.utils.BackstageUtils;
+import com.linkiing.ble.utils.ByteUtils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -44,6 +48,8 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     private final Handler handler = new Handler(Looper.getMainLooper());
     //过滤名称字符串
     private String FILTER_NAME_STR = "";
+    //过滤Service UUID
+    private String FILTER_SERVICE_UUID_STR = "";
     //过滤广播包
     private final List<byte[]> FILTER_RECORD = new ArrayList<>();
     //过滤信号强度等级
@@ -126,6 +132,16 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     }
 
     /**
+     * 设置过滤ServiceUuid字符串
+     *
+     * @param str 过滤ServiceUuid字符串
+     */
+    public BLEScanner setFilterServiceUuid(String str) {
+        this.FILTER_SERVICE_UUID_STR = str.toUpperCase(Locale.ENGLISH);
+        return this;
+    }
+
+    /**
      * 设置广播包过滤
      *
      * @param filterRecord bytes
@@ -160,6 +176,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      */
     public void clearFilters() {
         this.FILTER_NAME_STR = "";
+        this.FILTER_SERVICE_UUID_STR = "";
         this.FILTER_RECORD.clear();
         this.FILTER_RSSI_LEVEL = 0;
         this.bleScannerFilterCallback = null;
@@ -172,7 +189,11 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      *                （在重启蓝牙开关的时候应该是true，否则是false）
      */
     public void startScan(boolean nowScan) {
-        LOGUtils.d("startScan()  FILTER_NAME_STR:" + FILTER_NAME_STR + " FILTER_RSSI_LEVEL:" + FILTER_RSSI_LEVEL + " FILTER_RECORD:" + FILTER_RECORD.size());
+        LOGUtils.d("startScan()  FILTER_NAME_STR:" + FILTER_NAME_STR
+                + " FILTER_SERVICE_UUID_STR:" + FILTER_SERVICE_UUID_STR
+                + " FILTER_RSSI_LEVEL:" + FILTER_RSSI_LEVEL
+                + " FILTER_RECORD:" + FILTER_RECORD.size());
+
         LOGUtils.d("startScan()  nowScan:" + nowScan + " isScanning:" + isScanning);
 
         devListClear();
@@ -345,8 +366,15 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             LOGUtils.e("BLEScanner error! onScanResult address.length()!=17  ==> " + address);
             return;
         }
-        if (!nameFilters(device.getName())) {
+        String name = device.getName();
+        if (TextUtils.isEmpty(name)) {
+            name = "";
+        }
+        if (!nameFilters(name)) {
             //LOGUtils.e("------ nameFilters ------");
+            return;
+        }
+        if (!serviceUuidFilters(result.getScanRecord().getServiceUuids())){
             return;
         }
         if (!rssiLevelFilters(result.getRssi())) {
@@ -354,7 +382,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             return;
         }
         if (bleScannerFilterCallback != null) {
-            if (!bleScannerFilterCallback.isFilter(device.getName(), scanRecord, result.getRssi())) {
+            if (!bleScannerFilterCallback.isFilter(name, scanRecord, result.getRssi())) {
                 //LOGUtils.e("------ bleScannerFilterCallback ------");
                 return;
             }
@@ -362,21 +390,22 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
 //        LOGUtils.v("name:" + device.getName() + " address:" + address);
         if (deviceList.isEmpty()) {
             BLEDevice data = new BLEDevice();
-            data.setData(device, result.getScanRecord().getBytes(), result.getRssi());
+            data.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
             deviceList.add(data);
             sendDevData(data);
         } else {
             BLEDevice devData = getBLEDevice(address);
             if (devData != null) {
-                //扫描到相同的设备,更新信号强度
+                //扫描到相同的设备,更新数据
                 devData.setRssi(result.getRssi());
                 devData.setScanRecord(result.getScanRecord().getBytes());
+                devData.setParcelUuids(result.getScanRecord().getServiceUuids());
                 if (System.currentTimeMillis() - callBackTime > SEND_VALUE_TIME) {
                     sendDevData(devData);
                 }
             } else {
                 BLEDevice data = new BLEDevice();
-                data.setData(device, result.getScanRecord().getBytes(), result.getRssi());
+                data.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
                 deviceList.add(data);
                 sendDevData(data);
             }
@@ -406,17 +435,39 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * @param devName 过滤名称字符串
      */
     private boolean nameFilters(String devName) {
-        if (devName == null) {
-            return false;
-        }
-        if (devName.equals("")) {
-            return false;
-        }
         if (FILTER_NAME_STR.equals("")) {
             //过滤字符串为空，则不过滤设备
             return true;
+        } else {
+            if (devName.equals("")) {
+                return false;
+            }
         }
         return devName.contains(FILTER_NAME_STR);
+    }
+
+    /**
+     * ServiceUuid过滤
+     *
+     * @param parcelUuids 过滤ServiceUuid列表
+     */
+    private boolean serviceUuidFilters(List<ParcelUuid> parcelUuids) {
+        if (FILTER_SERVICE_UUID_STR.equals("")) {
+            //过滤字符串为空，则不过滤设备
+            return true;
+        } else {
+            if (parcelUuids == null) {
+                return false;
+            }
+            for (ParcelUuid uuid : parcelUuids) {
+                if (uuid != null) {
+                    if (uuid.toString().toUpperCase(Locale.ENGLISH).contains(FILTER_SERVICE_UUID_STR)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**

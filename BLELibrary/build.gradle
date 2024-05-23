@@ -12,13 +12,26 @@ android {
         targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'consumer-rules.pro'
+
+        // 配置此参数，在app打包时加载混淆配置文件
+        consumerProguardFiles "proguard-rules.pro"
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    //aar重名了
+    android.libraryVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "BLELibrary_v${project.versionName}.aar"
         }
     }
 
