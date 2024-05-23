@@ -35,6 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 蓝牙操作主类
+ * https://github.com/JaelynWuJionglin/JaBLELibrary
  */
 public class BLEManager {
     public static final long DEF_CONNECT_OUT_TIME = 15 * 1000;
