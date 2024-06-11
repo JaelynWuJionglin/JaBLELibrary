@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/ly_top"
+        layout="@layout/connected_dev_top_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/color_top_item1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp">
+
+        <Button
+            android:id="@+id/bt_rssi_start"
+            android:layout_width="150dp"
+            android:layout_height="45dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:text="开始读RSSI"/>
+
+        <EditText
+            android:id="@+id/et_rssi_time"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="45dp"
+            android:layout_marginStart="10dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:text="500"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:text="ms"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_rssi_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
+        android:textStyle="bold"
+        android:text="--"/>
+
+
+    <Button
+        android:id="@+id/bt_reset_mesh"
+        android:layout_width="150dp"
+        android:layout_height="45dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:text="MESH RESET"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="60dp"/>
+</LinearLayout>

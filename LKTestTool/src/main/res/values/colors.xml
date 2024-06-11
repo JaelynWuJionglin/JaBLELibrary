@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="act_bg">#ECECE9</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="white1">#F5F5DC</color>
+    <color name="text_color">#3f3f3f</color>
+    <color name="color_gray">#FF696969</color>
+    <color name="color_gray_">#9F9D9D</color>
+    <color name="color_gray1">#EEEEEE</color>
+    <color name="color_gray2">#FAFAFA</color>
+    <color name="color_gray3">#DDDDDD</color>
+    <color name="color_top_item">#1E65B3</color>
+    <color name="color_top_item1">#2880E1</color>
+    <color name="color_green">#29B12E</color>
+    <color name="color_blue_hint">#70B7F4</color>
+    <color name="color_bt">#0B0B0B</color>
+    <color name="color_theme">#174f8c</color>
+    <color name="color_theme1">#1E65B3</color>
+    <color name="color_red">#F44336</color>
+    <color name="color_yellow">#FFC107</color>
+</resources>

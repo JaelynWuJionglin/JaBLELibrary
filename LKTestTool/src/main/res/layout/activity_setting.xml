@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <com.linkiing.test.tool.view.TitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:bgColor="@color/color_theme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIvId="@drawable/back_arrow_24"
+        app:titleText="@string/text_setting" />
+
+    <!-- 连接设置 -->
+    <TextView
+        android:id="@+id/tv_connect_test_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/color_gray2"
+        android:paddingTop="6dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/text_connect_set"
+        android:textColor="@color/text_color"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleBar" />
+
+    <LinearLayout
+        android:id="@+id/ly_connect_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/color_gray2"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_connect_test_title">
+
+        <TextView
+            android:id="@+id/rd_time"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/test_con_out_time"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            android:gravity="center_vertical"/>
+
+        <SeekBar
+            android:id="@+id/seekBar_time"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:max="85"
+            android:progress="0"
+            android:paddingStart="15dp"
+            android:paddingEnd="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="15秒"
+            android:textColor="@color/text_color"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <!-- 连接测试设置 -->
+    <TextView
+        android:id="@+id/tv_connect_test_set_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/color_gray2"
+        android:paddingTop="6dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/text_connect_test_set"
+        android:textColor="@color/text_color"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ly_connect_set" />
+
+    <LinearLayout
+        android:id="@+id/ly_connect_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/color_gray2"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_connect_test_set_title">
+
+        <TextView
+            android:id="@+id/rd_number"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/text_test_number"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            android:gravity="center_vertical"/>
+
+        <SeekBar
+            android:id="@+id/seekBar_number"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:max="19"
+            android:progress="0"
+            android:paddingStart="15dp"
+            android:paddingEnd="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_number"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="1次"
+            android:textColor="@color/text_color"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_connect_test_button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_gray2"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ly_connect_test" >
+
+        <Button
+            android:id="@+id/bt_connect_test_number"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@color/color_gray3"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/color_blue_hint"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="设置测试分组数量:0"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_connect_test_button2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_gray2"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ly_connect_test_button1" >
+
+        <Button
+            android:id="@+id/bt_share_test_file"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@color/color_gray3"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/color_blue_hint"
+            android:textSize="14sp"
+            android:text="@string/test_share_test_data"/>
+
+        <Button
+            android:id="@+id/bt_reset_connect_test_data"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@color/color_gray3"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_marginStart="25dp"
+            android:textColor="@color/color_red"
+            android:textSize="14sp"
+            android:text="@string/text_reset_connect_test_data"/>
+    </LinearLayout>
+
+    <!-- 连接设置 -->
+    <TextView
+        android:id="@+id/tv_other_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/color_gray2"
+        android:paddingTop="6dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/text_other_set"
+        android:textColor="@color/text_color"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ly_connect_test_button2" />
+
+    <LinearLayout
+        android:id="@+id/ly_other_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_gray2"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_other_set" >
+
+        <Button
+            android:id="@+id/bt_share_log"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@color/color_gray3"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/color_blue_hint"
+            android:textSize="14sp"
+            android:text="@string/text_share_log"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_app_ver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Linkiing Tool (V1.0.0)"
+        android:textColor="@color/color_gray"
+        android:textSize="14sp"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

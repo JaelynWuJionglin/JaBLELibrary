@@ -36,4 +36,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "JaBLELibrary"
 include ':BLELibrary'
-include ':app'
+include ':LKTestTool'

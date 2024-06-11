@@ -35,13 +35,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 蓝牙操作主类
- * https://github.com/JaelynWuJionglin/JaBLELibrary
+ * <a href="https://github.com/JaelynWuJionglin/JaBLELibrary">...</a>
  */
 public class BLEManager {
     public static final long DEF_CONNECT_OUT_TIME = 15 * 1000;
     private final CopyOnWriteArrayList<BLEDevice> bleConnectDeviceList = new CopyOnWriteArrayList<>();
     private volatile static BLEManager instance = null;
-    private BLECallbackImp bleCallbackImp;
+    private final BLECallbackImp bleCallbackImp;
     private BluetoothReceiver bluetoothReceiver;
     private Application context;
     private BluetoothManager mBluetoothManager = null;
@@ -75,7 +75,7 @@ public class BLEManager {
     /**
      * 设置BLE配置
      *
-     * @param bleConfig
+     * @param bleConfig BLE配置
      */
     public BLEManager setBleConfig(BLEConfig bleConfig) {
         this.bleConfig = bleConfig;

@@ -46,6 +46,8 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    //过滤mac地址
+    private String FILTER_MAC_STR = "";
     //过滤名称字符串
     private String FILTER_NAME_STR = "";
     //过滤Service UUID
@@ -122,6 +124,16 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     }
 
     /**
+     * 设置过滤mac地址
+     *
+     * @param macStr 过滤的mac字符串
+     */
+    public BLEScanner setFilterMacStr(String macStr){
+        this.FILTER_MAC_STR = macStr.toUpperCase(Locale.ENGLISH);
+        return this;
+    }
+
+    /**
      * 设置过滤名称字符串
      *
      * @param str 过滤名称字符串
@@ -175,6 +187,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * 清除过滤条件
      */
     public void clearFilters() {
+        this.FILTER_MAC_STR = "";
         this.FILTER_NAME_STR = "";
         this.FILTER_SERVICE_UUID_STR = "";
         this.FILTER_RECORD.clear();
@@ -366,6 +379,10 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             LOGUtils.e("BLEScanner error! onScanResult address.length()!=17  ==> " + address);
             return;
         }
+        if (!TextUtils.isEmpty(FILTER_MAC_STR)
+                && !address.toUpperCase(Locale.ENGLISH).contains(FILTER_MAC_STR)) {
+            return;
+        }
         String name = device.getName();
         if (TextUtils.isEmpty(name)) {
             name = "";
@@ -374,7 +391,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             //LOGUtils.e("------ nameFilters ------");
             return;
         }
-        if (!serviceUuidFilters(result.getScanRecord().getServiceUuids())){
+        if (!serviceUuidFilters(result.getScanRecord().getServiceUuids())) {
             return;
         }
         if (!rssiLevelFilters(result.getRssi())) {

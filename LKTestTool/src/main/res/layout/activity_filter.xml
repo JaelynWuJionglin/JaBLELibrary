@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.linkiing.test.tool.view.TitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:bgColor="@color/color_theme"
+        app:endIvId="@drawable/baseline_check_24"
+        app:startIvId="@drawable/back_arrow_24"
+        app:titleText="@string/text_filter_set" />
+
+    <include
+        android:id="@+id/filter_name"
+        layout="@layout/layout_filter_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15dp" />
+
+    <include
+        android:id="@+id/filter_mac"
+        layout="@layout/layout_filter_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15dp" />
+
+    <include
+        android:id="@+id/filter_uuid"
+        layout="@layout/layout_filter_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15dp" />
+
+    <include
+        android:id="@+id/filter_record1"
+        layout="@layout/layout_filter_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15dp" />
+
+    <include
+        android:id="@+id/filter_record2"
+        layout="@layout/layout_filter_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="15dp" />
+
+    <include
+        android:id="@+id/filter_record3"
+        layout="@layout/layout_filter_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="15dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="15dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rssi:"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/rssi_seekbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="50"
+            android:progress="50" />
+
+        <TextView
+            android:id="@+id/tv_rssi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="100"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bt_reset"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="15dp"
+        android:text="@string/text_reset"
+        android:textColor="@color/color_red"
+        android:textSize="16sp" />
+</LinearLayout>

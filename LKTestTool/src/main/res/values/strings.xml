@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">LK工具</string>
+
+    <string name="notifyTitle">提示</string>
+    <string name="gpsNotifyMsg">当前应用需要打开定位功能,请点击设置-定位服务-打开定位功能</string>
+    <string name="confirm_text">确定</string>
+    <string name="cancel_text">取消</string>
+
+    <string name="bluetooth_not_supported">不支持蓝牙！</string>
+    <string name="please_turn_on_bluetooth">请打开蓝牙！</string>
+    <string name="connection_success">已连接</string>
+    <string name="connection_ing">连接中</string>
+    <string name="connection_dis">未连接</string>
+    <string name="connected_dev">已连接设备!</string>
+
+    <string name="text_wait">请稍等…</string>
+    <string name="text_device_list">设备列表</string>
+    <string name="text_filter_set">过滤设置</string>
+    <string name="text_confirm">确定</string>
+    <string name="text_reset">重置</string>
+    <string name="text_start">START</string>
+    <string name="text_stop">STOP</string>
+    <string name="text_scan">SCAN</string>
+    <string name="text_disconnect">DISCONNECT</string>
+    <string name="text_connect">CONNECT</string>
+    <string name="text_connect_test">连接测试</string>
+    <string name="text_setting">设置</string>
+    <string name="text_dev_name">设备名</string>
+    <string name="text_mac_address">Mac地址</string>
+    <string name="text_result">结果</string>
+    <string name="text_xiang_qing">详情</string>
+    <string name="text_rssi">信号</string>
+    <string name="text_scan_device_size">搜索到设备:</string>
+    <string name="text_test_dev_size">已测设备数:</string>
+    <string name="text_success_p">成功次数:</string>
+    <string name="text_fail_p">失败次数:</string>
+    <string name="text_connect_set">连接设置</string>
+    <string name="text_connect_test_set">连接测试设置</string>
+    <string name="text_input_filter_name">请输入过滤名称</string>
+    <string name="text_input_filter_mac">请输入过滤Mac地址</string>
+    <string name="text_input_filter_uuid">请输入过滤的UUID</string>
+    <string name="text_reset_sus">重置成功。</string>
+    <string name="text_test_number">测试次数</string>
+    <string name="test_con_out_time">连接超时时间</string>
+    <string name="test_share_test_data">分享连接测试数据</string>
+    <string name="text_reset_connect_test_data">重置连接测试数据</string>
+    <string name="test_share_file">分享文件</string>
+    <string name="text_share_log">分享日志</string>
+    <string name="text_other_set">其他设置</string>
+    <string name="test_share_scan_test_data">分享搜索设备列表数据</string>
+    <string name="text_test_retry">失败重测</string>
+    <string name="text_operation_successful">操作成功！</string>
+    <string name="text_pl_input">请输入</string>
+    <string name="text_input_gd_number">请输入分组数量</string>
+    <string name="text_set_gd_number">设置测试分组数量:</string>
+</resources>

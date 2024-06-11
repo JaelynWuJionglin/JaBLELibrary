@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.linkiing.test.tool.view.TitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:bgColor="@color/color_theme"
+        app:endText="@string/text_start"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIvId="@drawable/back_arrow_24"
+        app:titleText="@string/text_connect_test" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/color_theme1" />
+
+    <include
+        android:id="@+id/title_item"
+        layout="@layout/connect_test_title_item"
+        android:layout_width="match_parent"
+        android:layout_height="32dp" />
+
+    <View
+        android:id="@+id/title_line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/color_top_item1" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="15dp"
+        android:layout_weight="1" />
+
+    <include
+        android:id="@+id/bottom_item"
+        layout="@layout/connect_test_bottom_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="3dp"/>
+
+</LinearLayout>

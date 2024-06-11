@@ -1,0 +1,89 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.linkiing.test.tool'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.linkiing.test.tool"
+        minSdk 21
+        targetSdk 33
+        versionCode 4
+        versionName "1.0.4"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release_key {
+            storeFile file('lk_wbr_app.jks')
+            storePassword 'linkiing@'
+            keyAlias = "lk_wbr_app"
+            keyPassword 'linkiing@'
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release_key
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release_key
+        }
+    }
+
+    android.applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            def curTime = new Date()
+            def timeStr = curTime.format('yyyyMMddHHmmss')
+            outputFileName = "LK工具-v${variant.versionName}-${timeStr}.apk"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        buildConfig = true
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation "androidx.core:core-ktx:1.9.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation 'com.google.android.material:material:1.8.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    //============================================================================
+    implementation project(path: ':BLELibrary')
+
+    //权限 （BLELibrary需要）
+    implementation 'com.github.getActivity:XXPermissions:18.5'
+    //============================================================================
+
+    //下拉刷新,上拉加载更多
+    implementation 'io.github.scwang90:refresh-layout-kernel:2.0.5'      //核心必须依赖
+    implementation 'io.github.scwang90:refresh-header-radar:2.1.0'       //雷达刷新头
+
+    //gson
+    implementation "com.google.code.gson:gson:2.10"
+
+    //导出Excel
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+}

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:name=".app.App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LKBleTool" >
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name=".ui.StartActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:theme="@style/Theme.Start">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.ScanActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.FilterActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.ConnectTestActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.SettingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.ConnectedActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+
+    </application>
+
+</manifest>

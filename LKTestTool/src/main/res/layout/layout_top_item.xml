@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_top_item"
+    android:orientation="horizontal"
+    android:paddingStart="15dp"
+    android:paddingTop="1dp"
+    android:paddingEnd="15dp"
+    android:paddingBottom="1dp"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/logo_text"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tv_list_number"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="5dp"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:text="Num:0"
+        android:textColor="@color/white1"
+        android:textSize="16sp"
+        app:drawableEndCompat="@drawable/black_bluetooth_24" />
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/tv_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:text="Filter"
+        android:textColor="@color/white1"
+        android:textSize="16sp"
+        app:drawableEndCompat="@drawable/baseline_filter_alt_24" />
+</LinearLayout>

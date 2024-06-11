@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.linkiing.test.tool.view.TitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:titleText="@string/text_device_list"
+        app:bgColor="@color/color_theme"
+        app:startIvId="@drawable/baseline_settings_24"
+        app:endText="@string/text_stop"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/color_theme1" />
+
+    <include
+        android:id="@+id/top_item"
+        layout="@layout/layout_top_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/color_top_item1" />
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        app:srlEnableLoadMore="false"
+        app:srlEnableRefresh="true">
+
+        <com.scwang.smart.refresh.header.BezierRadarHeader
+            android:id="@+id/bezierRadarHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srlAccentColor="@color/white"
+            app:srlFinishDuration="0"
+            android:scrollbarFadeDuration="0"
+            app:srlPrimaryColor="@color/act_bg"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp"/>
+
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+
+</LinearLayout>
