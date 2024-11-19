@@ -433,7 +433,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     public void onScanFailed(int errorCode) {
         super.onScanFailed(errorCode);
         LOGUtils.e("BLEScanner error! onScanFailed errorCode = " + errorCode);
-        if (errorCode == ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED) {
+        if (errorCode == ScanCallback.SCAN_FAILED_SCANNING_TOO_FREQUENTLY) {
             LOGUtils.e("Error！扫描过于频繁。");
         } else if (errorCode == ScanCallback.SCAN_FAILED_ALREADY_STARTED) {
             isScan(false, 2);
