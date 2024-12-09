@@ -125,6 +125,7 @@ class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
 
         adapter.setOnItemListener {
             if (it.isConnected) {
+                bleScanner.stopScan()
                 goActivity(
                     ConnectedActivity::class.java, false,
                     AcExtra("deviceName", it.deviceName),
