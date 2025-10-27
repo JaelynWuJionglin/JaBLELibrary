@@ -6,13 +6,16 @@
         <item name="colorPrimary">@color/color_theme</item>
         <item name="colorPrimaryVariant">@color/act_bg</item>
         <item name="colorOnPrimary">@color/act_bg</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/color_theme</item>
         <item name="backgroundColor">@color/act_bg</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
     </style>
 
     <style name="Theme.Start" parent="Theme.LKBleTool">
         <item name="colorPrimaryDark">@color/color_theme1</item>
         <item name="android:navigationBarColor">@color/color_theme1</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/color_theme1</item>
         <item name="android:windowBackground">@color/color_theme1</item>
     </style>

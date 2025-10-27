@@ -1,0 +1,15 @@
+<resources>
+
+    <style name="Theme.LKBleTool" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorAccent">@color/color_theme</item>
+        <item name="colorPrimary">@color/color_theme</item>
+        <item name="colorPrimaryVariant">@color/act_bg</item>
+        <item name="colorOnPrimary">@color/act_bg</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/color_theme</item>
+        <item name="backgroundColor">@color/act_bg</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+
+</resources>

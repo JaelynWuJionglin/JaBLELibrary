@@ -102,7 +102,7 @@ class BLECommandPolicy implements BLEWriteCallback {
             switch (msg.what) {
                 case hanPostOn:
                     //执行命令
-                    if (commandFormatList.size() > 0) {
+                    if (!commandFormatList.isEmpty()) {
                         CommandFormat commandFormat = commandFormatList.get(0);
                         if (commandFormat != null) {
                             //LOGUtils.d(TAG + " hanPostOn ==> reduceCmdNumber:" + commandFormat.getSendCmdNumber());
@@ -133,7 +133,7 @@ class BLECommandPolicy implements BLEWriteCallback {
                     }
                     break;
                 case hanRemove:
-                    if (commandFormatList.size() > 0) {
+                    if (!commandFormatList.isEmpty()) {
                         commandFormatList.remove(0);
                     }
                     postMessage(hanPostOn, 0);
@@ -169,7 +169,7 @@ class BLECommandPolicy implements BLEWriteCallback {
         }
         String servicesUUID = commandHolder.getServicesUUID();
         String characteristicUUID = commandHolder.getCharacteristicUUID();
-        if (servicesUUID.equals("") || characteristicUUID.equals("")) {
+        if (servicesUUID.isEmpty() || characteristicUUID.isEmpty()) {
             LOGUtils.e(TAG + " Error! ServicesUUID.equals() || CharacteristicUUID.equals()");
             return false;
         }

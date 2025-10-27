@@ -465,7 +465,7 @@ object LOGUtils {
                     @Suppress("DEPRECATION")
                     pi.versionCode.toString()
                 }
-                erInfoMap["versionName"] = versionName
+                erInfoMap["versionName"] = versionName ?: ""
                 erInfoMap["versionCode"] = versionCode
             }
         } catch (e: PackageManager.NameNotFoundException) {

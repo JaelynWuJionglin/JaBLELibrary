@@ -9,7 +9,7 @@ import java.io.ByteArrayOutputStream
 /**
  * 拼包
  */
-internal class PackageMontage constructor(
+internal class PackageMontage(
     private val agmMaxLength: Int = 512,
     private val vendorId: Int = 0xA0,
     private val startByte: Int = 0xDC,

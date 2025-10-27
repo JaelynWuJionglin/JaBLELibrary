@@ -94,7 +94,10 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
      * 发送命令
      */
     fun sendCmdBytes(
-        serviceUUID: String, characteristicUUID: String, cmd: Int, bytes: ByteArray
+        serviceUUID: String,
+        characteristicUUID: String,
+        cmd: Int,
+        bytes: ByteArray
     ): Boolean {
         if (bytes.size <= agmMaxLength) {
             return sendData(serviceUUID, characteristicUUID, false, cmd, bytes)
@@ -117,7 +120,11 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
     }
 
     private fun sendData(
-        serviceUUID: String, characteristicUUID: String, next: Boolean, cmd: Int, bytes: ByteArray
+        serviceUUID: String,
+        characteristicUUID: String,
+        next: Boolean,
+        cmd: Int,
+        bytes: ByteArray
     ): Boolean {
         val len = bytes.size + 1
         val data = ByteArray(len)

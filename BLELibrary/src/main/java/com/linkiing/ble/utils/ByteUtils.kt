@@ -84,14 +84,7 @@ object ByteUtils {
      */
     @JvmStatic
     fun toHexString(byteArray: ByteArray): String {
-        val hexString = StringBuilder()
-        for (i in byteArray.indices) {
-            if ((byteArray[i].toInt() and 0xff) < 0x10){//0~F前面不零
-                hexString.append("0")
-            }
-            hexString.append(Integer.toHexString(0xFF and byteArray[i].toInt()))
-        }
-        return hexString.toString().uppercase(Locale.getDefault())
+        return toHexString(byteArray,"")
     }
 
     /**

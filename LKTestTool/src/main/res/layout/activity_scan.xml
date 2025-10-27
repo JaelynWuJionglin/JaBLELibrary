@@ -8,7 +8,7 @@
     <com.linkiing.test.tool.view.TitleBar
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         app:titleText="@string/text_device_list"
         app:bgColor="@color/color_theme"
         app:startIvId="@drawable/baseline_settings_24"

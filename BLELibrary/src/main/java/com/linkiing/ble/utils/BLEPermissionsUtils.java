@@ -74,8 +74,8 @@ public class BLEPermissionsUtils {
             XXPermissions
                     .with(activity)
                     //.unchecked()// 设置不触发错误检测机制（局部设置）
-                    .permission(Permission.ACCESS_FINE_LOCATION)
-                    .permission(Permission.ACCESS_COARSE_LOCATION)
+                    //.permission(Permission.ACCESS_FINE_LOCATION)
+                    //.permission(Permission.ACCESS_COARSE_LOCATION)
                     .permission(Permission.BLUETOOTH_SCAN)
                     .permission(Permission.BLUETOOTH_CONNECT)
                     .permission(Permission.BLUETOOTH_ADVERTISE)
