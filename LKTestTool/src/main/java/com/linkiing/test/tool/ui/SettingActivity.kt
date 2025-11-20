@@ -56,10 +56,12 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
 
         binding.btShareLog.setOnClickListener {
             binding.btShareLog.isEnabled = false
-            LOGUtils.shareAppLogFile {
-                runOnUiThread {
-                    FileJaUtils.shareFile(this, it, getString(R.string.text_share_log))
-                    binding.btShareLog.isEnabled = true
+            LOGUtils.shareAppLogFile { file ->
+                if (file != null) {
+                    runOnUiThread {
+                        FileJaUtils.shareFile(this, file, getString(R.string.text_share_log))
+                        binding.btShareLog.isEnabled = true
+                    }
                 }
             }
         }
@@ -67,11 +69,12 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
         binding.btConnectTestNumber.setOnClickListener {
             mInputTextDialog?.setTitleText(getString(R.string.text_input_gd_number))
                 ?.setDefText(SpHelper.instance.getConnectTestGdNumber().toString())
-                ?.setEditTextInputTypeNumber(true)
+                ?.setEditTextInputType(InputTextDialog.TEXT_INPUT_TYPE_NUM)
                 ?.setOnDialogListener {
                     val num = MyUtils.strOrInt(it)
                     SpHelper.instance.setConnectTestGdNumber(num)
-                    binding.btConnectTestNumber.text = "${getString(R.string.text_set_gd_number)}$num"
+                    binding.btConnectTestNumber.text =
+                        "${getString(R.string.text_set_gd_number)}$num"
                 }
                 ?.showDialog()
 

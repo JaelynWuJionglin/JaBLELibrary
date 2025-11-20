@@ -11,6 +11,7 @@ import com.linkiing.ble.callback.BLENotificationCallback;
 import com.linkiing.ble.callback.BLEReadCallback;
 import com.linkiing.ble.callback.BLEReadRssiCallback;
 import com.linkiing.ble.log.LOGUtils;
+import com.linkiing.ble.utils.ByteUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -107,6 +108,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
             UUID uuid = characteristic.getUuid();
             String uuidStr = uuid != null ? uuid.toString() : null;
             byte[] bytes = characteristic.getValue();
+            LOGUtils.d("onCharacteristicChanged uuid:" + uuidStr + " bytes:" + ByteUtils.toHexString(bytes));
             for (BLENotificationCallback notificationCallback : BLECallbackImp.getInstance().getNotificationCallbackList()) {
                 if (notificationCallback != null && uuidStr != null) {
                     notificationCallback.onNotificationCallback(getCurrentDevice(), uuidStr, bytes);

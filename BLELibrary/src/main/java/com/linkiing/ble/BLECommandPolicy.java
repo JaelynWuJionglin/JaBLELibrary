@@ -217,9 +217,7 @@ class BLECommandPolicy implements BLEWriteCallback {
             return false;
         }
         characteristic.setWriteType(writeType);
-        boolean isWrite = bluetoothGatt.writeCharacteristic(characteristic);
-        LOGUtils.d(TAG + " commandExecute ==> isWrite:" + isWrite);
-        return isWrite;
+        return bluetoothGatt.writeCharacteristic(characteristic);
     }
 
     @SuppressLint("MissingPermission")

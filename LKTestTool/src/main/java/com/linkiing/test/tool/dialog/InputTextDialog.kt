@@ -14,7 +14,13 @@ class InputTextDialog(context: Context) :
     private var defText = ""
     private var titleText = ""
     private var maxInputLength = 0
-    private var isTypeNumber = false
+    private var textInputType = TEXT_INPUT_TYPE_DEF
+
+    companion object {
+        const val TEXT_INPUT_TYPE_DEF = 0
+        const val TEXT_INPUT_TYPE_NUM = 1
+        const val TEXT_INPUT_TYPE_EN_TEXT = 2
+    }
 
     /**
      * 设置按钮的显示内容和监听
@@ -66,10 +72,20 @@ class InputTextDialog(context: Context) :
     /**
      * 设置限制输入数字
      */
-    fun setEditTextInputTypeNumber(isTypeNumber: Boolean): InputTextDialog{
-        this.isTypeNumber = isTypeNumber
-        if (isTypeNumber) {
-            binding.etInput.inputType = InputType.TYPE_CLASS_NUMBER
+    fun setEditTextInputType(textInputType: Int): InputTextDialog{
+        this.textInputType = textInputType
+        when(textInputType) {
+            TEXT_INPUT_TYPE_NUM -> {
+                binding.etInput.inputType = InputType.TYPE_CLASS_NUMBER
+            }
+
+            TEXT_INPUT_TYPE_EN_TEXT -> {
+                binding.etInput.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+
+            else -> {
+                binding.etInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
+            }
         }
         return this
     }
@@ -101,9 +117,7 @@ class InputTextDialog(context: Context) :
 
         setEditTextInputLengthFilter()
 
-        if (isTypeNumber) {
-            binding.etInput.inputType = InputType.TYPE_CLASS_NUMBER
-        }
+        setEditTextInputType(textInputType)
 
         if (defText != "") {
             binding.etInput.setText(defText)

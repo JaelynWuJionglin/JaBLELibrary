@@ -15,39 +15,23 @@
         android:layout_height="1px"
         android:background="@color/color_top_item1" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <!-- MESH RESET -->
+    <Button
+        android:id="@+id/bt_reset_mesh"
+        android:layout_width="150dp"
+        android:layout_height="45dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:text="MESH RESET"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"/>
+
+    <include
+        android:id="@+id/item_rssi"
+        layout="@layout/layout_bt_edit"
         android:layout_marginTop="30dp"
-        android:orientation="horizontal"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp">
-
-        <Button
-            android:id="@+id/bt_rssi_start"
-            android:layout_width="150dp"
-            android:layout_height="45dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:text="开始读RSSI"/>
-
-        <EditText
-            android:id="@+id/et_rssi_time"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="45dp"
-            android:layout_marginStart="10dp"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:text="500"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:text="ms"/>
-    </LinearLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <TextView
         android:id="@+id/tv_rssi_list"
@@ -62,13 +46,35 @@
         android:text="--"/>
 
 
+    <!-- -->
+    <include
+        android:id="@+id/item_adv_inv"
+        layout="@layout/layout_bt_edit_2"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include
+        android:id="@+id/item_con_inv"
+        layout="@layout/layout_bt_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include
+        android:id="@+id/item_pid"
+        layout="@layout/layout_bt_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <Button
-        android:id="@+id/bt_reset_mesh"
-        android:layout_width="150dp"
+        android:id="@+id/bt_modify_adv_name"
+        android:layout_width="wrap_content"
         android:layout_height="45dp"
+        android:minWidth="150dp"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:text="MESH RESET"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="60dp"/>
+        android:layout_marginEnd="15dp"
+        android:text="修改广播名称"/>
+
 </LinearLayout>

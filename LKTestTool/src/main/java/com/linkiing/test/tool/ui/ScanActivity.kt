@@ -9,13 +9,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.linkiing.ble.BLEDevice
+import com.linkiing.ble.NotificationFormat
 import com.linkiing.ble.api.BLEConfig
 import com.linkiing.ble.api.BLEManager
 import com.linkiing.ble.api.BLEScanner
 import com.linkiing.ble.callback.BLEConnectStatusCallback
 import com.linkiing.ble.callback.BLEPermissionCallback
 import com.linkiing.ble.callback.BLEScanDeviceCallback
-import com.linkiing.ble.lkagm.LKPackageAgm
 import com.linkiing.ble.log.FileJaUtils
 import com.linkiing.ble.log.LOGUtils
 import com.linkiing.ble.utils.BLEConstant
@@ -25,7 +25,6 @@ import com.linkiing.test.tool.adapter.BleListAdapter
 import com.linkiing.test.tool.base.BaseActivity
 import com.linkiing.test.tool.bean.AcExtra
 import com.linkiing.test.tool.ble.BleConstant
-import com.linkiing.test.tool.ble.BluAgreement
 import com.linkiing.test.tool.databinding.ActivityScanBinding
 import com.linkiing.test.tool.dialog.RoundProcessDialog
 import com.linkiing.test.tool.sp.SpHelper
@@ -33,6 +32,7 @@ import com.linkiing.test.tool.utlis.ByteUtils
 import com.linkiing.test.tool.utlis.ExcelUtils
 import com.linkiing.test.tool.utlis.ToastUtils
 import com.linkiing.test.tool.view.WcLinearLayoutManager
+import kotlin.collections.listOf
 
 class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
     BLEConnectStatusCallback {
@@ -114,6 +114,7 @@ class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
                 if (BLEManager.getInstance()
                         .setBleConfig(BLEConfig.getBLEConfig(1))
                         .setConnectOutTime(30 * 1000)
+                        .setNotificationList(BleConstant.getNotificationList())
                         .connectDevice(bleDevice)
                 ) {
                     dialog.showDialog(R.string.text_wait)
@@ -246,13 +247,6 @@ class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
                     //连接上设备
                     Log.d("BLE_TAG", "--------------->BLE_STATUS_CONNECTED")
 
-                    //添加设备通知数据监听
-                    LKPackageAgm.instance.addDeviceNotificationListener(
-                        bleDevice,
-                        BleConstant.NOT_UUID,
-                        BluAgreement.instance
-                    )
-
                     dialog.dismissDialog()
 
                     listUpdate()
@@ -265,13 +259,6 @@ class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
                 BLEConstant.BLE_STATUS_DISCONNECTED -> {
                     //断开连接
                     Log.d("BLE_TAG", "--------------->BLE_STATUS_DISCONNECTED")
-
-                    //移除设备通知数据监听
-                    LKPackageAgm.instance.removeDeviceNotificationListener(
-                        bleDevice,
-                        BleConstant.NOT_UUID
-                    )
-
                     listUpdate()
                 }
 
@@ -305,7 +292,14 @@ class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
         if (!isAvailable) {
             return
         }
-        LOGUtils.v("deviceMac:${bleDevice.deviceMac}  name:${bleDevice.deviceName}  scanRecord:${ByteUtils.toHexString(bleDevice.scanRecord,",")}")
+        LOGUtils.v(
+            "deviceMac:${bleDevice.deviceMac}  name:${bleDevice.deviceName}  scanRecord:${
+                ByteUtils.toHexString(
+                    bleDevice.scanRecord,
+                    ","
+                )
+            }"
+        )
         runOnUiThread {
             listUpdate()
         }

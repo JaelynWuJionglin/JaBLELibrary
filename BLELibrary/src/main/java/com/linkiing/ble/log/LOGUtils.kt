@@ -61,7 +61,7 @@ object LOGUtils {
 
     //分享App日志
     @SuppressLint("SimpleDateFormat")
-    fun shareAppLogFile(listener: (File) -> Unit) {
+    fun shareAppLogFile(listener: (File?) -> Unit) {
         if (TextUtils.isEmpty(logPath) || mApplication == null) {
             return
         }
@@ -87,6 +87,7 @@ object LOGUtils {
                     }
                 }
             }
+
             listener(File(sharePath))
         }.start()
     }

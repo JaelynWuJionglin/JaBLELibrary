@@ -7,7 +7,6 @@ import android.os.Process
 import com.linkiing.ble.api.BLEConfig
 import com.linkiing.ble.api.BLEManager
 import com.linkiing.ble.log.LOGUtils
-import com.linkiing.test.tool.ble.BluAgreement
 import com.linkiing.test.tool.sp.SpHelper
 import com.linkiing.test.tool.ui.ScanActivity
 import com.linkiing.test.tool.utlis.ToastUtils

@@ -253,7 +253,7 @@ public class BLEManager {
      * 是否连接上了设备
      */
     public boolean isConnectDevices() {
-        return getConnectDevice().size() > 0;
+        return !getConnectDevice().isEmpty();
     }
 
     /**
