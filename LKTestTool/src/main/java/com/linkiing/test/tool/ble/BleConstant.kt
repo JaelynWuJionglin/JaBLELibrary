@@ -9,7 +9,8 @@ object BleConstant {
 
     const val SERVICE_TEST1 = "f000ccc0-0451-4000-b000-000000000000" // 服务
     const val SEND_UUID_TEST1 = "f000ccc5-0451-4000-b000-000000000000" // 通道
-    const val NOTIF_UUID_TEST1 = "f000ccc5-0451-4000-b000-000000000000" // 通道
+    const val NOTIF_UUID_TEST1 = "f000ccc5-0451-4000-b000-000000000000" // 通道\
+
 
     /**
      * 设置通知

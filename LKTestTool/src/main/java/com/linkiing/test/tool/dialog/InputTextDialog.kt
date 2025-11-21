@@ -111,19 +111,11 @@ class InputTextDialog(context: Context) :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (titleText != "") {
-            binding.tvTitle.text = titleText
-        }
+        setTitleText(titleText)
 
         setEditTextInputLengthFilter()
-
         setEditTextInputType(textInputType)
-
-        if (defText != "") {
-            binding.etInput.setText(defText)
-            binding.etInput.setSelection(binding.etInput.text?.length ?: 0)
-            binding.etInput.requestFocus()
-        }
+        setDefText(defText)
 
         //设置确定按钮被点击后，向外界提供监听
         binding.tvConfirm.setOnClickListener {
@@ -131,6 +123,7 @@ class InputTextDialog(context: Context) :
             val text: String = binding.etInput.text?.toString() ?: ""
             listener(text)
         }
+
         //设置取消按钮被点击后，向外界提供监听
         binding.tvCancel.setOnClickListener {
             dismissDialog()

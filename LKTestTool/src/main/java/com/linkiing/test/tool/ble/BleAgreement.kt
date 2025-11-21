@@ -39,8 +39,8 @@ class BleAgreement private constructor() {
         val minBytes = ByteUtils.intToByteArray(minInv)
         val maxBytes = ByteUtils.intToByteArray(maxInv)
         val sendBytes = byteArrayOf(
-            minBytes[0],minBytes[1],minBytes[2],minBytes[3],
-            maxBytes[0],maxBytes[1],maxBytes[2],maxBytes[3]
+            minBytes[3],minBytes[2],minBytes[1],minBytes[0],
+            maxBytes[3],maxBytes[2],maxBytes[1],maxBytes[0]
         )
         return sendBytesTest1(1,sendBytes)
     }
@@ -48,8 +48,13 @@ class BleAgreement private constructor() {
     /**
      * 修改连接间隔
      */
-    fun modifyConInv(conInv: Int): Boolean {
-        val sendBytes = ByteUtils.intToByteArray(conInv)
+    fun modifyConInv(minInv: Int, maxInv: Int): Boolean {
+        val minBytes = ByteUtils.intToByteArray(minInv)
+        val maxBytes = ByteUtils.intToByteArray(maxInv)
+        val sendBytes = byteArrayOf(
+            minBytes[3],minBytes[2],
+            maxBytes[3],maxBytes[2]
+        )
         return sendBytesTest1(2,sendBytes)
     }
 
@@ -69,9 +74,17 @@ class BleAgreement private constructor() {
     /**
      * 修改PID
      */
-    fun modifyPid(pid: Int): Boolean {
-        val sendBytes = ByteUtils.intToByteArray(pid)
-        return sendBytesTest1(4,sendBytes)
+    fun modifyPid(pidStr: String): Boolean {
+        val pidBytes = pidStr.toByteArray(Charsets.UTF_8)
+        val sendBytes = if (pidBytes.size <= 4) {
+            val bytes = ByteArray(4)
+            System.arraycopy(pidBytes,0,bytes,0,pidBytes.size)
+            bytes
+        } else {
+            pidBytes.slice(0 until 4).toByteArray()
+        }
+        val reversedSendBytes = sendBytes.reversedArray()
+        return sendBytesTest1(4,reversedSendBytes)
     }
 
     //sendBytesTest1

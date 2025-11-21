@@ -5,18 +5,15 @@ import android.os.Handler
 import android.os.Looper
 import com.linkiing.ble.BLEDevice
 import com.linkiing.ble.api.BLEManager
-import com.linkiing.ble.api.BLEWriteDataFormat
 import com.linkiing.ble.callback.BLENotificationCallback
 import com.linkiing.ble.callback.BLEReadRssiCallback
 import com.linkiing.ble.log.LOGUtils
 import com.linkiing.ble.utils.ByteUtils
-import com.linkiing.test.tool.R
 import com.linkiing.test.tool.base.BaseActivity
 import com.linkiing.test.tool.ble.BleAgreement
 import com.linkiing.test.tool.ble.BleConstant
 import com.linkiing.test.tool.databinding.ActivityConnectedBinding
 import com.linkiing.test.tool.dialog.InputTextDialog
-import com.linkiing.test.tool.sp.SpHelper
 import com.linkiing.test.tool.utlis.MyUtils
 import com.linkiing.test.tool.utlis.ToastUtils
 import java.util.Locale
@@ -33,6 +30,7 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
     private var refReadRssiUiTime = 0L
     private var deviceName = ""
     private var deviceMac = ""
+    private var modifyAdvName = ""
 
     override fun initBind(): ActivityConnectedBinding {
         return ActivityConnectedBinding.inflate(layoutInflater)
@@ -54,10 +52,8 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
         binding.itemAdvInv.etModify2.setText("100")
 
         binding.itemConInv.btModify.text = "修改连接间隔"
-        binding.itemConInv.etModify.setText("100")
-
-        binding.itemPid.btModify.text = "修改PID"
-        binding.itemPid.etModify.setText("1")
+        binding.itemConInv.etModify1.setText("30")
+        binding.itemConInv.etModify2.setText("30")
 
         mInputTextDialog = InputTextDialog(this)
 
@@ -104,32 +100,45 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
         binding.itemAdvInv.btModify.setOnClickListener {
             val minInv = MyUtils.strOrInt(binding.itemAdvInv.etModify1.text?.toString() ?: "")
             val maxInv = MyUtils.strOrInt(binding.itemAdvInv.etModify2.text?.toString() ?: "")
-            BleAgreement.instance.modifyAdvInv(minInv,maxInv)
+            BleAgreement.instance.modifyAdvInv(minInv, maxInv)
         }
 
         binding.itemConInv.btModify.setOnClickListener {
-            val conInv = MyUtils.strOrInt(binding.itemConInv.etModify.text?.toString() ?: "")
-            BleAgreement.instance.modifyConInv(conInv)
+            val minInv = MyUtils.strOrInt(binding.itemConInv.etModify1.text?.toString() ?: "")
+            val maxInv = MyUtils.strOrInt(binding.itemConInv.etModify2.text?.toString() ?: "")
+            BleAgreement.instance.modifyConInv(minInv, maxInv)
         }
 
         binding.btModifyAdvName.setOnClickListener {
             mInputTextDialog?.setTitleText("请输入蓝牙广播名(长度小于10)")
-                ?.setDefText(deviceName)
                 ?.setEditTextMaxInputLength(10)
+                ?.setDefText(deviceName)
                 ?.setEditTextInputType(InputTextDialog.TEXT_INPUT_TYPE_EN_TEXT)
                 ?.setOnDialogListener {
-                   if (it.isNotEmpty()) {
-                       BleAgreement.instance.modifyAdvName(it)
-                   } else {
-                       ToastUtils.instance.toastInfo("请输入名称!")
-                   }
+                    if (it.isNotEmpty()) {
+                        if (BleAgreement.instance.modifyAdvName(it)) {
+                            modifyAdvName = it
+                        }
+                    } else {
+                        ToastUtils.instance.toastInfo("请输入名称!")
+                    }
                 }
                 ?.showDialog()
         }
 
-        binding.itemPid.btModify.setOnClickListener {
-            val pid = MyUtils.strOrInt(binding.itemPid.etModify.text?.toString() ?: "")
-            BleAgreement.instance.modifyPid(pid)
+        binding.btModifyPid.setOnClickListener {
+            mInputTextDialog?.setTitleText("请输入PID(长度4)")
+                ?.setEditTextMaxInputLength(4)
+                ?.setDefText("")
+                ?.setEditTextInputType(InputTextDialog.TEXT_INPUT_TYPE_EN_TEXT)
+                ?.setOnDialogListener {
+                    if (it.isNotEmpty()) {
+                        BleAgreement.instance.modifyPid(it)
+                    } else {
+                        ToastUtils.instance.toastInfo("请输入PID!")
+                    }
+                }
+                ?.showDialog()
         }
     }
 
@@ -182,6 +191,51 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
     ) {
         if (uuid.uppercase(Locale.ENGLISH) == BleConstant.NOTIF_UUID_TEST1.uppercase(Locale.ENGLISH)) {
             LOGUtils.i("MSG ==> bytes:${ByteUtils.toHexString(bytes)}")
+            if (bytes.size >= 6) {
+                val cmd = ByteUtils.byteArrayToInt(byteArrayOf(bytes[2], bytes[3]))
+                val result = ByteUtils.byteToInt(bytes[4])
+                runOnUiThread {
+                    when (cmd) {
+                        0x8001, 0x8002 -> {//修改广播间隔,修改连接间隔
+                            when (result) {
+                                0 -> {
+                                    ToastUtils.instance.toastInfo("修改成功!")
+                                }
+
+                                1 -> {
+                                    ToastUtils.instance.toastInfo("参数范围不对!")
+                                }
+
+                                2 -> {
+                                    ToastUtils.instance.toastInfo("参数长度不对!")
+                                }
+
+                                else -> {
+                                    ToastUtils.instance.toastInfo("其他错误!")
+                                }
+                            }
+                        }
+
+                        0x8003 -> {//修改广播名称
+                            if (result == 0) {
+                                deviceName = modifyAdvName
+                                binding.lyTop.tvDevName.text = deviceName
+                                ToastUtils.instance.toastInfo("修改成功!")
+                            } else {
+                                ToastUtils.instance.toastInfo("修改失败!")
+                            }
+                        }
+
+                        0x8004 -> {//修改PID
+                            if (result == 0) {
+                                ToastUtils.instance.toastInfo("修改成功!")
+                            } else {
+                                ToastUtils.instance.toastInfo("修改失败!")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
