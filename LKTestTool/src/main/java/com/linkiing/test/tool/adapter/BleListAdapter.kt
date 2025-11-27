@@ -34,9 +34,12 @@ class BleListAdapter(private var context: Context) :
     }
 
     fun clearItem() {
+        val oldSize = devList.size
         BLEScanner.getInstance().devListClear()
         devList.clear()
-        notifyDataSetChanged()
+        devList.addAll(BLEScanner.getInstance().allDevList)
+        notifyItemRangeRemoved(0, oldSize)
+        notifyItemRangeChanged(0, oldSize)
     }
 
     fun setOnBtListener(btListener: (BLEDevice) -> Unit) {

@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import com.linkiing.ble.BLEDevice
 import com.linkiing.ble.api.BLEManager
+import com.linkiing.ble.api.BLEScanner
 import com.linkiing.ble.callback.BLENotificationCallback
 import com.linkiing.ble.callback.BLEReadRssiCallback
 import com.linkiing.ble.log.LOGUtils
@@ -220,6 +221,7 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
                             if (result == 0) {
                                 deviceName = modifyAdvName
                                 binding.lyTop.tvDevName.text = deviceName
+                                BLEScanner.getInstance().updateBLEDeviceName(deviceMac, deviceName)
                                 ToastUtils.instance.toastInfo("修改成功!")
                             } else {
                                 ToastUtils.instance.toastInfo("修改失败!")

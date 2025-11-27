@@ -22,6 +22,7 @@ import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
 import com.linkiing.ble.utils.BackstageUtils;
 import com.linkiing.ble.utils.ByteUtils;
+import com.linkiing.ble.utils.ScanRecordUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -128,7 +129,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      *
      * @param macStr 过滤的mac字符串
      */
-    public BLEScanner setFilterMacStr(String macStr){
+    public BLEScanner setFilterMacStr(String macStr) {
         this.FILTER_MAC_STR = macStr.toUpperCase(Locale.ENGLISH);
         return this;
     }
@@ -285,6 +286,24 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
     }
 
     /**
+     * 修改BLEDevice 蓝牙名
+     *
+     * @param macAddress mac地址
+     * @param newName    要改的名字
+     */
+    public void updateBLEDeviceName(String macAddress, String newName) {
+        if (newName == null) {
+            newName = "";
+        }
+        for (BLEDevice dev : deviceList) {
+            if (dev.getDeviceMac().equals(macAddress)) {
+                dev.setDeviceName(newName);
+                break;
+            }
+        }
+    }
+
+    /**
      * addBLEDevice
      *
      * @param bleDevice BLEDevice
@@ -361,6 +380,10 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             return;
         }
         byte[] scanRecord = result.getScanRecord().getBytes();
+        if (scanRecord == null) {
+            LOGUtils.e("BLEScanner error! onScanResult result.getScanRecord()==null");
+            return;
+        }
 //        LOGUtils.v("name:" + result.getDevice().getName() + " scanRecord:" + ByteUtils.toHexString(scanRecord,","));
         if (!recordFilters(scanRecord)) {
             return;
@@ -384,7 +407,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             return;
         }
         String name = device.getName();
-        if (TextUtils.isEmpty(name)) {
+        if (name == null) {
             name = "";
         }
         if (!nameFilters(name)) {
@@ -405,26 +428,30 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             }
         }
 //        LOGUtils.v("name:" + device.getName() + " address:" + address);
+        BLEDevice devData = null;
         if (deviceList.isEmpty()) {
-            BLEDevice data = new BLEDevice();
-            data.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
-            deviceList.add(data);
-            sendDevData(data);
+            devData = new BLEDevice();
+            devData.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
+            deviceList.add(devData);
+            sendDevData(devData);
         } else {
-            BLEDevice devData = getBLEDevice(address);
+            devData = getBLEDevice(address);
             if (devData != null) {
                 //扫描到相同的设备,更新数据
-                devData.setRssi(result.getRssi());
-                devData.setScanRecord(result.getScanRecord().getBytes());
-                devData.setParcelUuids(result.getScanRecord().getServiceUuids());
+//                devData.setRssi(result.getRssi());
+//                devData.setScanRecord(result.getScanRecord().getBytes());
+//                devData.setParcelUuids(result.getScanRecord().getServiceUuids());
+//                devData.setDevice(device);
+//                devData.setDeviceName(name);
+                devData.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
                 if (System.currentTimeMillis() - callBackTime > SEND_VALUE_TIME) {
                     sendDevData(devData);
                 }
             } else {
-                BLEDevice data = new BLEDevice();
-                data.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
-                deviceList.add(data);
-                sendDevData(data);
+                devData = new BLEDevice();
+                devData.setData(device, result.getScanRecord().getBytes(), result.getScanRecord().getServiceUuids(), result.getRssi());
+                deviceList.add(devData);
+                sendDevData(devData);
             }
         }
     }
