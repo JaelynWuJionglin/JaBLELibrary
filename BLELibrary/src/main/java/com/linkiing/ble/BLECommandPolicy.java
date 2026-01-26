@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothStatusCodes;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -184,7 +186,7 @@ class BLECommandPolicy implements BLEWriteCallback {
         }
         switch (commandHolder.getCommandType()) {
             case BLEConstant.Command_Type_write:
-                boolean isWrite = writeCharacteristic(characteristic, commandHolder.getWRITE_TYPE(), commandHolder.getBytes());
+                boolean isWrite = writeCharacteristic(characteristic, commandHolder.getBytes(), commandHolder.getWRITE_TYPE());
                 LOGUtils.d(TAG + " commandExecute ==> isWrite:" + isWrite);
                 return isWrite;
             case BLEConstant.Command_Type_read:
@@ -207,17 +209,21 @@ class BLECommandPolicy implements BLEWriteCallback {
 
     //写
     @SuppressLint("MissingPermission")
-    private boolean writeCharacteristic(@NonNull BluetoothGattCharacteristic characteristic, int writeType, byte[] bytes) {
+    private boolean writeCharacteristic(@NonNull BluetoothGattCharacteristic characteristic, byte[] bytes, int writeType) {
         if (bytes == null || bytes.length == 0) {
             LOGUtils.e(TAG + " Error! bytes == null || bytes.length == 0");
             return false;
         }
-        if (!characteristic.setValue(bytes)) {
-            LOGUtils.e(TAG + " Error! characteristic.setValue(bytes) == false");
-            return false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return bluetoothGatt.writeCharacteristic(characteristic, bytes, writeType) == BluetoothStatusCodes.SUCCESS;
+        } else {
+            if (!characteristic.setValue(bytes)) {
+                LOGUtils.e(TAG + " Error! characteristic.setValue(bytes) == false");
+                return false;
+            }
+            characteristic.setWriteType(writeType);
+            return bluetoothGatt.writeCharacteristic(characteristic);
         }
-        characteristic.setWriteType(writeType);
-        return bluetoothGatt.writeCharacteristic(characteristic);
     }
 
     @SuppressLint("MissingPermission")

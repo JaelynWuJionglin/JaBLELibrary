@@ -42,6 +42,7 @@ class BLEConnect implements BLEConnectCallback {
     public static final int hanConnectOutTime = 1007;
     public static final int hanDisconnect = 1008;
     public static final int hanSetNotification = 1009;
+    public static final int hanRefreshCache = 1010;
     private static final int DISCOVER_SERVICES_MAX_INDEX = 3;//扫描服务重试次数
     private final int MTU_SET = 512;
     private final BluetoothGattCallback bluetoothGattCallback;
@@ -56,6 +57,7 @@ class BLEConnect implements BLEConnectCallback {
     private boolean isConnecting = false;
     private boolean isConnected = false;
     private boolean isMtuRequested = false;
+    private boolean isActiveDiscovered = false;
     private int mtuSize = 20;
     private int discoverServicesIndex = 0;
 
@@ -160,7 +162,7 @@ class BLEConnect implements BLEConnectCallback {
             return false;
         }
 
-        if (!BLEManager.getInstance().isBleOpen()){
+        if (!BLEManager.getInstance().isBleOpen()) {
             return false;
         }
 
@@ -209,12 +211,12 @@ class BLEConnect implements BLEConnectCallback {
 
         //发起设备连接
         if (bleConnectHandler != null) {
-            postMessageDelayed(hanConnect,delayTime);
+            postMessageDelayed(hanConnect, delayTime);
         }
 
         //开启超时检测
         if (bleConnectHandler != null) {
-            postMessageDelayed(hanConnectOutTime,connectOutTime);
+            postMessageDelayed(hanConnectOutTime, connectOutTime);
         }
 
         return true;
@@ -287,7 +289,14 @@ class BLEConnect implements BLEConnectCallback {
             try {
                 if (bluetoothGatt != null) {
                     Method localMethod = bluetoothGatt.getClass().getMethod("refresh");
-                    return (Boolean) localMethod.invoke(bluetoothGatt);
+                    Object object = localMethod.invoke(bluetoothGatt);
+                    boolean bool = false;
+                    if (object != null) {
+                        bool = (Boolean) object;
+                    }
+                    if (bool) {
+                        postMessageDelayed(hanRefreshCache, 0);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -358,6 +367,7 @@ class BLEConnect implements BLEConnectCallback {
                     break;
                 case hanServicesDiscoverTimeOut:
                     //扫描服务超时
+                    isActiveDiscovered = false;
                     if (discoverServicesIndex < DISCOVER_SERVICES_MAX_INDEX) {
                         discoverServicesIndex++;
                         //重新扫描服务
@@ -410,6 +420,7 @@ class BLEConnect implements BLEConnectCallback {
                     break;
                 case hanBleActivate:
                     //蓝牙连接成功并可用（通知设置完成，mtu申请完成）
+                    isMtuRequested = false;
                     isConnecting = false;
                     isConnected = true;
                     postConnectStatus(BLEConstant.BLE_STATUS_CONNECTED);
@@ -425,6 +436,12 @@ class BLEConnect implements BLEConnectCallback {
                         bleConnectHandler.removeMessages(hanConnectOutTime);
                     }
                     postConnectStatus(BLEConstant.BLE_STATUS_DISCONNECTED);
+                    break;
+                case hanRefreshCache:
+                    //refreshCache
+                    if (bluetoothGatt != null) {
+                        bluetoothGatt.discoverServices();
+                    }
                     break;
             }
         }
@@ -462,7 +479,9 @@ class BLEConnect implements BLEConnectCallback {
         notificationSetList.clear();
         synchronized (BLUETOOTH_GATT_LOCK) {
             if (bluetoothGatt != null) {
+                isActiveDiscovered = true;
                 if (!bluetoothGatt.discoverServices()) {
+                    isActiveDiscovered = false;
                     bluetoothGatt.disconnect();
                 } else {
                     postMessageDelayed(hanServicesDiscoverTimeOut, 1500);
@@ -474,7 +493,7 @@ class BLEConnect implements BLEConnectCallback {
     /*请求设置mtu*/
     private void requestMtu() {
         LOGUtils.i(TAG + " requestMtu start!");
-        isMtuRequested = true;
+        this.isMtuRequested = true;
         boolean isRequestMtu = false;
         synchronized (BLUETOOTH_GATT_LOCK) {
             if (bluetoothGatt != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -482,7 +501,7 @@ class BLEConnect implements BLEConnectCallback {
                 LOGUtils.v(TAG + " requestMtu  = " + isRequestMtu);
             }
         }
-        //2s mtu请求为回复，直接连接设备完成
+        //2s mtu请求未回复，直接连接设备完成
         postMessageDelayed(hanBleActivate, 2000);
     }
 
@@ -512,8 +531,13 @@ class BLEConnect implements BLEConnectCallback {
 
     @Override
     public void onBLEServicesDiscovered(BluetoothGatt gatt, int status) {
+        LOGUtils.i(TAG + " discoverServices status:" + status + " isActiveDiscovered:" + isActiveDiscovered);
+        if (!isActiveDiscovered) {
+            return;
+        }
+        isActiveDiscovered = false;
+
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            LOGUtils.i(TAG + " discoverServices success!");
             if (bleConnectHandler != null) {
                 bleConnectHandler.removeMessages(hanServicesDiscoverTimeOut);
             }
@@ -523,6 +547,7 @@ class BLEConnect implements BLEConnectCallback {
                 gatt.disconnect();
             }
         }
+        isActiveDiscovered = false;
     }
 
     //设置通知特征值写回应
