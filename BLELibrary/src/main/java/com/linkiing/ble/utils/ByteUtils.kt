@@ -54,7 +54,7 @@ object ByteUtils {
      * Byte转无符号Int
      */
     @JvmStatic
-    fun byteToInt(byte:Byte): Int {
+    fun byteToInt(byte: Byte): Int {
         return (byte.toInt() and 0xFF)
     }
 
@@ -65,10 +65,10 @@ object ByteUtils {
      * @return 16进制表示格式的字符串, <separator>分割
      */
     @JvmStatic
-    fun toHexString(byteArray: ByteArray,separator: String): String {
+    fun toHexString(byteArray: ByteArray, separator: String): String {
         val hexString = StringBuilder()
         for (i in byteArray.indices) {
-            if ((byteArray[i].toInt() and 0xff) < 0x10){//0~F前面不零
+            if ((byteArray[i].toInt() and 0xff) < 0x10) {//0~F前面不零
                 hexString.append("0")
             }
             hexString.append(Integer.toHexString(0xFF and byteArray[i].toInt()) + separator)
@@ -84,7 +84,7 @@ object ByteUtils {
      */
     @JvmStatic
     fun toHexString(byteArray: ByteArray): String {
-        return toHexString(byteArray,"")
+        return toHexString(byteArray, "")
     }
 
     /**
@@ -94,7 +94,7 @@ object ByteUtils {
     fun toHexString(intArray: IntArray): String {
         val hexString = StringBuilder()
         for (i in intArray.indices) {
-            if ((intArray[i] and 0xff) < 0x10){//0~F前面不零
+            if ((intArray[i] and 0xff) < 0x10) {//0~F前面不零
                 hexString.append("0")
             }
             hexString.append(Integer.toHexString(0xFF and intArray[i]))
@@ -119,5 +119,17 @@ object ByteUtils {
 
     private fun toByte(c: Char): Int {
         return "0123456789ABCDEF".indexOf(c)
+    }
+
+    /**
+     * mac地址是否相同
+     */
+    @JvmStatic
+    fun macAddressSame(address1: String, address2: String): Boolean {
+        val mac1 = address1.replace(":","")
+            .uppercase(Locale.ENGLISH)
+        val mac2 = address2.replace(":","")
+            .uppercase(Locale.ENGLISH)
+        return mac1.isNotEmpty() && mac1 == mac2
     }
 }

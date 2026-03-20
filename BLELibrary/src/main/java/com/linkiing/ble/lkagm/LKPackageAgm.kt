@@ -53,7 +53,7 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
     fun addDeviceNotificationListener(
         bleDevice: BLEDevice,
         notificationUUID: String,
-        deviceNotificationCallback: LkAgmPackageCallback
+        deviceNotificationCallback: LkAgmPackageCallback,
     ) {
         if (!haveListener(bleDevice, notificationUUID)) {
             val packageMontage = PackageMontage(
@@ -97,10 +97,11 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
         serviceUUID: String,
         characteristicUUID: String,
         cmd: Int,
-        bytes: ByteArray
+        bytes: ByteArray,
+        writeType: Int,
     ): Boolean {
-        if (bytes.size <= agmMaxLength) {
-            return sendData(serviceUUID, characteristicUUID, false, cmd, bytes)
+        return if (bytes.size <= agmMaxLength) {
+            sendData(serviceUUID, characteristicUUID, false, cmd, bytes, writeType)
         } else {
             for (size in bytes.indices step agmMaxLength) {
                 var len: Int = agmMaxLength
@@ -111,7 +112,7 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
                 }
                 val sizeData = ByteArray(len)
                 System.arraycopy(bytes, size, sizeData, 0, sizeData.size)
-                if (!sendData(serviceUUID, characteristicUUID, next, cmd, sizeData)) {
+                if (!sendData(serviceUUID, characteristicUUID, next, cmd, sizeData, writeType)) {
                     return false
                 }
             }
@@ -124,7 +125,8 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
         characteristicUUID: String,
         next: Boolean,
         cmd: Int,
-        bytes: ByteArray
+        bytes: ByteArray,
+        writeType: Int,
     ): Boolean {
         val len = bytes.size + 1
         val data = ByteArray(len)
@@ -150,6 +152,7 @@ class LKPackageAgm private constructor() : BLENotificationCallback {
         writeDataFormat.servicesUUID = serviceUUID
         writeDataFormat.characteristicUUID = characteristicUUID
         writeDataFormat.bytes = sendData
+        writeDataFormat.writeType = writeType
         if (BLEManager.getInstance().sendDataToConnect(writeDataFormat)) {
             LOGUtils.v("BLE SEND ==> bytes:${ByteUtils.toHexString(sendData, ",")}")
             return true

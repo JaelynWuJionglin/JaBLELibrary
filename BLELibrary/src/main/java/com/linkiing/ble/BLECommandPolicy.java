@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import com.linkiing.ble.api.BLEManager;
 import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
+import com.linkiing.ble.utils.ByteUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,13 +25,13 @@ class BLECommandPolicy implements BLEWriteCallback {
     private static final String TAG = "BLECommandPolicy";
     public static final int hanPostOn = 1001;
     public static final int hanRemove = 1002;
+    public static final int hanTimeOut = 1003;
     private final BLECommandPolicyHandler bleCommandPolicyHandler;
     private final CopyOnWriteArrayList<CommandFormat> commandFormatList = new CopyOnWriteArrayList<>();
     private BluetoothGatt bluetoothGatt;
 
     public BLECommandPolicy() {
-        bleCommandPolicyHandler = new BLECommandPolicyHandler(Looper.getMainLooper(),
-                BLEManager.getInstance().getContext());
+        bleCommandPolicyHandler = new BLECommandPolicyHandler(Looper.getMainLooper(), BLEManager.getInstance().getContext());
     }
 
     @Override
@@ -38,25 +39,26 @@ class BLECommandPolicy implements BLEWriteCallback {
         this.bluetoothGatt = bluetoothGatt;
 
         if (commandFormat == null) {
-            LOGUtils.e(TAG + "sendCommandFormat Error! commandFormat == null");
+            LOGUtils.e(TAG + " sendCommandFormat Error! commandFormat == null");
             return false;
         }
         byte[] data = commandFormat.getBytes();
         if (data == null) {
-            LOGUtils.e(TAG + "sendCommandFormat Error! data == null");
+            LOGUtils.e(TAG + " sendCommandFormat Error! data == null");
             return false;
         }
         int dataLen = data.length;
         if (dataLen == 0 && commandFormat.getCommandType().equals(BLEConstant.Command_Type_write)) {
-            LOGUtils.e(TAG + "sendCommandFormat Error! Command_Type_write data.length == 0");
+            LOGUtils.e(TAG + " sendCommandFormat Error! Command_Type_write data.length == 0");
             return false;
         }
+
+        LOGUtils.d(TAG + " sendCommandFormat sus! dataLen:" + dataLen + " mtuSize:" + mtuSize);
 
         /*根据mtu长度，对数据分包，*/
         if (dataLen <= mtuSize) {
             addData(commandFormat);
         } else {
-            CommandFormat cf = new CommandFormat(commandFormat);
             for (int size = 0; size < dataLen; size += mtuSize) {
                 int len = mtuSize;
                 if (size + mtuSize >= dataLen) {
@@ -64,11 +66,11 @@ class BLECommandPolicy implements BLEWriteCallback {
                 }
                 byte[] sizeData = new byte[len];
                 System.arraycopy(data, size, sizeData, 0, sizeData.length);
+                CommandFormat cf = new CommandFormat(commandFormat);
                 cf.setBytes(sizeData);
                 addData(cf);
             }
         }
-
         return true;
     }
 
@@ -101,52 +103,73 @@ class BLECommandPolicy implements BLEWriteCallback {
                 return;
             }
 
-            switch (msg.what) {
-                case hanPostOn:
-                    //执行命令
-                    if (!commandFormatList.isEmpty()) {
-                        CommandFormat commandFormat = commandFormatList.get(0);
+            if (!commandFormatList.isEmpty()) {
+                CommandFormat commandFormat = commandFormatList.get(0);
+                switch (msg.what) {
+                    case hanPostOn:
+                        //执行命令
                         if (commandFormat != null) {
-                            //LOGUtils.d(TAG + " hanPostOn ==> reduceCmdNumber:" + commandFormat.getSendCmdNumber());
-                            if (commandFormat.getSendCmdNumber() > 0) {
-                                //重发次数大于0，命令失败重新执行
-                                commandFormat.reduceCmdNumber();
+                            int sendCmdNumber = commandFormat.getSendCmdNumber();
+//                            LOGUtils.d(TAG + " onHanPostCmd"
+//                                    + " sendCmdNumber:" + sendCmdNumber
+//                                    + " size:" + commandFormatList.size()
+//                                    + " data:" + ByteUtils.toHexString(commandFormat.getBytes()));
+                            if (commandFormat.getCommandType().equals(BLEConstant.Command_Type_write)
+                                    && commandFormat.getWRITE_TYPE() == BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE) {
+                                //不带回应的写，不回触发onCharacteristicWrite，无重发
                                 if (commandExecute(commandFormat)) {
                                     //发送成功等待写回应
-                                    if (commandFormat.getCommandType().equals(BLEConstant.Command_Type_write)
-                                            || commandFormat.getCommandType().equals(BLEConstant.Command_Type_read)) {
-                                        //读写
-                                        postMessage(hanPostOn, 500);
-                                    } else {
-                                        //设置通知
-                                        postMessage(hanRemove, 10);
-                                    }
+                                    postMessage(hanRemove, 0);
                                 } else {
                                     //命令发送错误，下一条
                                     postMessage(hanRemove, 500);
                                 }
                             } else {
-                                //命令发送错误，下一条
-                                postMessage(hanRemove, 10);
+                                if (sendCmdNumber > 0) {
+                                    //重发次数大于0，命令失败重新执行
+                                    commandFormat.reduceCmdNumber();
+                                    if (commandExecute(commandFormat)) {
+                                        //发送成功等待写回应
+                                        postMessage(hanPostOn, 1000);
+                                    } else {
+                                        //命令发送错误，下一条
+                                        postMessage(hanRemove, 500);
+                                    }
+                                } else {
+                                    //命令发送错误，下一条
+                                    postMessage(hanRemove, 0);
+                                }
                             }
                         } else {
-                            postMessage(hanRemove, 10);
+                            postMessage(hanRemove, 0);
                         }
-                    }
-                    break;
-                case hanRemove:
-                    if (!commandFormatList.isEmpty()) {
+                        break;
+                    case hanRemove:
+                        //指令移除
                         commandFormatList.remove(0);
-                    }
-                    postMessage(hanPostOn, 0);
-                    break;
+                        postMessage(hanPostOn, 0);
+                        break;
+                    case hanTimeOut:
+                        //指令超时
+                        if (commandFormat != null) {
+                            //超时重发
+                            postMessage(hanPostOn, 0);
+                        } else {
+                            postMessage(hanRemove, 0);
+                        }
+                        break;
+                }
+
             }
         }
     }
 
     private void addData(CommandFormat commandFormat) {
         commandFormatList.add(commandFormat);
-        if (commandFormatList.size() == 1) {
+        if (!bleCommandPolicyHandler.hasMessages(hanPostOn)
+                && !bleCommandPolicyHandler.hasMessages(hanRemove)
+                && !bleCommandPolicyHandler.hasMessages(hanTimeOut)) {
+            LOGUtils.d(TAG + " addData start hanPostOn!");
             postMessage(hanPostOn, 0);
         }
     }
@@ -187,7 +210,8 @@ class BLECommandPolicy implements BLEWriteCallback {
         switch (commandHolder.getCommandType()) {
             case BLEConstant.Command_Type_write:
                 boolean isWrite = writeCharacteristic(characteristic, commandHolder.getBytes(), commandHolder.getWRITE_TYPE());
-                LOGUtils.d(TAG + " commandExecute ==> isWrite:" + isWrite);
+                String bytesStr = ByteUtils.toHexString(commandHolder.getBytes());
+                LOGUtils.d(TAG + " commandExecute ==> isWrite:" + isWrite + " size:" + commandHolder.getBytes().length + " bytesStr:" + bytesStr);
                 return isWrite;
             case BLEConstant.Command_Type_read:
                 boolean isRead = readCharacteristic(characteristic);
@@ -248,15 +272,14 @@ class BLECommandPolicy implements BLEWriteCallback {
     }
 
     @Override
-    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor) {
-        bleCommandPolicyHandler.removeMessages(hanPostOn);
-        postMessage(hanRemove, 0);
-    }
-
-    @Override
     public void onCharacteristicReadCallback(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         bleCommandPolicyHandler.removeMessages(hanPostOn);
         postMessage(hanRemove, 0);
     }
 
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor) {
+        bleCommandPolicyHandler.removeMessages(hanPostOn);
+        postMessage(hanRemove, 0);
+    }
 }

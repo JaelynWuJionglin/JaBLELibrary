@@ -18,7 +18,7 @@ import com.linkiing.ble.utils.BLEConstant;
     private String commandType = "";//命令操作类型
     private byte[] bytes = new byte[0];//命令的数据
     private int WRITE_TYPE = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;//命令写入方式
-    private int sendCmdNumber;//若命令执行失败，重试次数
+    private int sendCmdNumber = 1;//若命令执行失败，重试次数
 
     public CommandFormat(CommandFormat commandFormat) {
         this.servicesUUID = commandFormat.getServicesUUID();
@@ -26,6 +26,7 @@ import com.linkiing.ble.utils.BLEConstant;
         this.commandType = commandFormat.getCommandType();
         this.WRITE_TYPE = commandFormat.getWRITE_TYPE();
         this.sendCmdNumber = commandFormat.getSendCmdNumber();
+        this.bytes = new byte[0];
     }
 
     public CommandFormat(BLEWriteDataFormat writeDataFormat){
