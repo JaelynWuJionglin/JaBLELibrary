@@ -94,6 +94,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     @Override
     public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicWrite(gatt, characteristic, status);
+        //LOGUtils.e("----------> onCharacteristicWrite: uuid:" + characteristic.getUuid().toString() + " status:" + status);
         if (!isThisGatt(gatt)) {
             return;
         }

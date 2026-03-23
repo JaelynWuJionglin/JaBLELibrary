@@ -39,10 +39,10 @@ class BleAgreement private constructor() {
         val minBytes = ByteUtils.intToByteArray(minInv)
         val maxBytes = ByteUtils.intToByteArray(maxInv)
         val sendBytes = byteArrayOf(
-            minBytes[3],minBytes[2],minBytes[1],minBytes[0],
-            maxBytes[3],maxBytes[2],maxBytes[1],maxBytes[0]
+            minBytes[3], minBytes[2], minBytes[1], minBytes[0],
+            maxBytes[3], maxBytes[2], maxBytes[1], maxBytes[0]
         )
-        return sendBytesTest1(1,sendBytes)
+        return sendBytesTest1(1, sendBytes)
     }
 
     /**
@@ -52,10 +52,10 @@ class BleAgreement private constructor() {
         val minBytes = ByteUtils.intToByteArray(minInv)
         val maxBytes = ByteUtils.intToByteArray(maxInv)
         val sendBytes = byteArrayOf(
-            minBytes[3],minBytes[2],
-            maxBytes[3],maxBytes[2]
+            minBytes[3], minBytes[2],
+            maxBytes[3], maxBytes[2]
         )
-        return sendBytesTest1(2,sendBytes)
+        return sendBytesTest1(2, sendBytes)
     }
 
     /**
@@ -68,7 +68,7 @@ class BleAgreement private constructor() {
         } else {
             nameBytes.slice(0 until 10).toByteArray()
         }
-        return sendBytesTest1(3,sendBytes)
+        return sendBytesTest1(3, sendBytes)
     }
 
     /**
@@ -78,17 +78,17 @@ class BleAgreement private constructor() {
         val pidBytes = pidStr.toByteArray(Charsets.UTF_8)
         val sendBytes = if (pidBytes.size <= 4) {
             val bytes = ByteArray(4)
-            System.arraycopy(pidBytes,0,bytes,0,pidBytes.size)
+            System.arraycopy(pidBytes, 0, bytes, 0, pidBytes.size)
             bytes
         } else {
             pidBytes.slice(0 until 4).toByteArray()
         }
         val reversedSendBytes = sendBytes.reversedArray()
-        return sendBytesTest1(4,reversedSendBytes)
+        return sendBytesTest1(4, reversedSendBytes)
     }
 
     //sendBytesTest1
-    private fun sendBytesTest1(cmd: Int,dataBytes: ByteArray): Boolean {
+    private fun sendBytesTest1(cmd: Int, dataBytes: ByteArray): Boolean {
         val startBytes = byteArrayOf(
             0xFF.toByte(),
             0xFE.toByte(),
@@ -96,8 +96,8 @@ class BleAgreement private constructor() {
             (cmd and 0xFF).toByte()
         )
         val sendData = ByteArray(startBytes.size + dataBytes.size + 1)
-        System.arraycopy(startBytes,0,sendData,0,startBytes.size)
-        System.arraycopy(dataBytes,0,sendData,startBytes.size,dataBytes.size)
+        System.arraycopy(startBytes, 0, sendData, 0, startBytes.size)
+        System.arraycopy(dataBytes, 0, sendData, startBytes.size, dataBytes.size)
         sendData[startBytes.size + dataBytes.size] = 0xFE.toByte()
 
         val writeDataFormat = BLEWriteDataFormat()
@@ -106,6 +106,21 @@ class BleAgreement private constructor() {
         writeDataFormat.bytes = sendData
         return if (BLEManager.getInstance().sendDataToConnect(writeDataFormat)) {
             LOGUtils.v("BLE sendBytesTest1 ==> bytes:${ByteUtils.toHexString(sendData, ",")}")
+            true
+        } else {
+            false
+        }
+    }
+
+
+    //sendBytesTest2
+    fun sendBytesTest2(sendStr: String): Boolean {
+        val writeDataFormat = BLEWriteDataFormat()
+        writeDataFormat.servicesUUID = BleConstant.SERVICE_TEST2
+        writeDataFormat.characteristicUUID = BleConstant.SEND_UUID_TEST2
+        writeDataFormat.bytes = sendStr.toByteArray(Charsets.UTF_8)
+        return if (BLEManager.getInstance().sendDataToConnect(writeDataFormat)) {
+            LOGUtils.v("BLE sendBytesTest1 ==> bytes:$sendStr")
             true
         } else {
             false

@@ -114,31 +114,19 @@ class BLECommandPolicy implements BLEWriteCallback {
 //                                    + " sendCmdNumber:" + sendCmdNumber
 //                                    + " size:" + commandFormatList.size()
 //                                    + " data:" + ByteUtils.toHexString(commandFormat.getBytes()));
-                            if (commandFormat.getCommandType().equals(BLEConstant.Command_Type_write)
-                                    && commandFormat.getWRITE_TYPE() == BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE) {
-                                //不带回应的写，不回触发onCharacteristicWrite，无重发
+                            if (sendCmdNumber > 0) {
+                                //重发次数大于0，命令失败重新执行
+                                commandFormat.reduceCmdNumber();
                                 if (commandExecute(commandFormat)) {
                                     //发送成功等待写回应
-                                    postMessage(hanRemove, 0);
+                                    postMessage(hanPostOn, 1000);
                                 } else {
                                     //命令发送错误，下一条
                                     postMessage(hanRemove, 500);
                                 }
                             } else {
-                                if (sendCmdNumber > 0) {
-                                    //重发次数大于0，命令失败重新执行
-                                    commandFormat.reduceCmdNumber();
-                                    if (commandExecute(commandFormat)) {
-                                        //发送成功等待写回应
-                                        postMessage(hanPostOn, 1000);
-                                    } else {
-                                        //命令发送错误，下一条
-                                        postMessage(hanRemove, 500);
-                                    }
-                                } else {
-                                    //命令发送错误，下一条
-                                    postMessage(hanRemove, 0);
-                                }
+                                //命令发送错误，下一条
+                                postMessage(hanRemove, 0);
                             }
                         } else {
                             postMessage(hanRemove, 0);
@@ -166,9 +154,7 @@ class BLECommandPolicy implements BLEWriteCallback {
 
     private void addData(CommandFormat commandFormat) {
         commandFormatList.add(commandFormat);
-        if (!bleCommandPolicyHandler.hasMessages(hanPostOn)
-                && !bleCommandPolicyHandler.hasMessages(hanRemove)
-                && !bleCommandPolicyHandler.hasMessages(hanTimeOut)) {
+        if (!bleCommandPolicyHandler.hasMessages(hanPostOn) && !bleCommandPolicyHandler.hasMessages(hanRemove) && !bleCommandPolicyHandler.hasMessages(hanTimeOut)) {
             LOGUtils.d(TAG + " addData start hanPostOn!");
             postMessage(hanPostOn, 0);
         }

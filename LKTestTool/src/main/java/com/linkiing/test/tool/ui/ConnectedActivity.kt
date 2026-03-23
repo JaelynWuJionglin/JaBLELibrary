@@ -141,6 +141,10 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
                 }
                 ?.showDialog()
         }
+
+        binding.btTest2.setOnClickListener {
+            BleAgreement.instance.sendBytesTest2("SWSON")
+        }
     }
 
     private val meshResetRunnable = Runnable {
@@ -190,8 +194,8 @@ class ConnectedActivity : BaseActivity<ActivityConnectedBinding>(),
         uuid: String,
         bytes: ByteArray
     ) {
+        LOGUtils.i("MSG ==> uuid:$uuid bytes:${ByteUtils.toHexString(bytes)}")
         if (uuid.uppercase(Locale.ENGLISH) == BleConstant.NOTIF_UUID_TEST1.uppercase(Locale.ENGLISH)) {
-            LOGUtils.i("MSG ==> bytes:${ByteUtils.toHexString(bytes)}")
             if (bytes.size >= 6) {
                 val cmd = ByteUtils.byteArrayToInt(byteArrayOf(bytes[2], bytes[3]))
                 val result = ByteUtils.byteToInt(bytes[4])
