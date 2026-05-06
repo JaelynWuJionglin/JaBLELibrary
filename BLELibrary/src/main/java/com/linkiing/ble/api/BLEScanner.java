@@ -204,6 +204,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      */
     public void startScan(boolean nowScan) {
         LOGUtils.d("startScan()  FILTER_NAME_STR:" + FILTER_NAME_STR
+                + " FILTER_MAC_STR:" + FILTER_MAC_STR
                 + " FILTER_SERVICE_UUID_STR:" + FILTER_SERVICE_UUID_STR
                 + " FILTER_RSSI_LEVEL:" + FILTER_RSSI_LEVEL
                 + " FILTER_RECORD:" + FILTER_RECORD.size());
@@ -402,8 +403,8 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
             LOGUtils.e("BLEScanner error! onScanResult address.length()!=17  ==> " + address);
             return;
         }
-        if (!TextUtils.isEmpty(FILTER_MAC_STR)
-                && !address.toUpperCase(Locale.ENGLISH).contains(FILTER_MAC_STR)) {
+        if (!TextUtils.isEmpty(FILTER_MAC_STR) && !ByteUtils.macAddressSame(FILTER_MAC_STR, address)) {
+            //LOGUtils.e("BLEScanner error! onScanResult macAddressSame false!  ==> " + FILTER_MAC_STR + "|" + address);
             return;
         }
         String name = device.getName();
@@ -479,11 +480,11 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * @param devName 过滤名称字符串
      */
     private boolean nameFilters(String devName) {
-        if (FILTER_NAME_STR.equals("")) {
+        if (FILTER_NAME_STR.isEmpty()) {
             //过滤字符串为空，则不过滤设备
             return true;
         } else {
-            if (devName.equals("")) {
+            if (devName.isEmpty()) {
                 return false;
             }
         }
@@ -496,7 +497,7 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * @param parcelUuids 过滤ServiceUuid列表
      */
     private boolean serviceUuidFilters(List<ParcelUuid> parcelUuids) {
-        if (FILTER_SERVICE_UUID_STR.equals("")) {
+        if (FILTER_SERVICE_UUID_STR.isEmpty()) {
             //过滤字符串为空，则不过滤设备
             return true;
         } else {

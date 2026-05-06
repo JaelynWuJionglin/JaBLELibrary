@@ -9,9 +9,9 @@ public interface BLEScanDeviceCallback {
     /**
      * 扫描设备回调
      *
-     * @param devices 设备
+     * @param device 设备
      */
-    void onScanDevice(@NotNull BLEDevice devices);
+    void onScanDevice(@NotNull BLEDevice device);
 
     /**
      * 扫描设备结束
