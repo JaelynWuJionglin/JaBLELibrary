@@ -7,10 +7,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.linkiing.ble.BLEDevice
 import com.linkiing.ble.api.BLEScanner
-import com.linkiing.ble.log.LOGUtils
 import com.linkiing.test.tool.R
 import com.linkiing.test.tool.databinding.BleDevListItemBinding
-import com.linkiing.test.tool.utlis.ByteUtils
 
 class BleListAdapter(private var context: Context) :
     RecyclerView.Adapter<BleListAdapter.MyHolder>() {

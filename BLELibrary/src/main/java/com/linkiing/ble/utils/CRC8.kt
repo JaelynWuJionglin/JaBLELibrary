@@ -1,7 +1,5 @@
 package com.linkiing.ble.utils
 
-import com.linkiing.ble.log.LOGUtils
-
 object CRC8 {
 
     /**

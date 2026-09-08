@@ -1,6 +1,5 @@
 package com.linkiing.ble.api;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
@@ -127,7 +126,6 @@ public class BLEManager {
     /**
      * 系统打开蓝牙
      */
-    @SuppressLint("MissingPermission")
     public void sysOpenBLE(Activity activity) {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         activity.startActivityForResult(intent, 9898);
@@ -191,7 +189,6 @@ public class BLEManager {
      * 1:支持蓝牙,但蓝牙功能未开启，发送开启蓝牙开关的广播。
      * 2:不支持蓝牙,或 BluetoothAdapter==null
      */
-    @SuppressLint("MissingPermission")
     public int checkBluetooth(Activity activity) {
         if (getBluetoothAdapter() != null) {
             if (getBluetoothAdapter().isEnabled()) {

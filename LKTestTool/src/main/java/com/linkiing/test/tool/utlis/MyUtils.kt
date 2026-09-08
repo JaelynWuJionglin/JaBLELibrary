@@ -2,7 +2,7 @@ package com.linkiing.test.tool.utlis
 
 import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 
 object MyUtils {

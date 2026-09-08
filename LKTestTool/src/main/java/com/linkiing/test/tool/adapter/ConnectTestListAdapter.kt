@@ -9,8 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.linkiing.ble.api.BLEScanner
-import com.linkiing.ble.log.LOGUtils
 import com.linkiing.test.tool.R
 import com.linkiing.test.tool.bean.ConnectTestBean
 import com.linkiing.test.tool.databinding.ConnectTestListItemBinding

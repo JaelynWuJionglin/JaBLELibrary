@@ -1,6 +1,5 @@
 package com.linkiing.ble;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -40,13 +39,13 @@ public class BLEUtils {
         BluetoothGattCharacteristic mBluetoothGattCharacteristic = null;
         if (gatt != null) {
             List<BluetoothGattService> GattService = gatt.getServices();
-            if (GattService.size() == 0) {
+            if (GattService.isEmpty()) {
                 return null;
             }
             for (BluetoothGattService gattService : GattService) {
                 if (gattService.getUuid().toString().trim().toLowerCase(Locale.ENGLISH).equals(ServicesUUID.toLowerCase(Locale.ENGLISH))) {
                     List<BluetoothGattCharacteristic> mGattCharacteristic = gattService.getCharacteristics();
-                    if (mGattCharacteristic.size() == 0) {
+                    if (mGattCharacteristic.isEmpty()) {
                         return null;
                     }
                     for (BluetoothGattCharacteristic gattCharacteristic : mGattCharacteristic) {
@@ -63,7 +62,6 @@ public class BLEUtils {
     /**
      * 打开通知
      */
-    @SuppressLint("MissingPermission")
     public static Boolean enableCharacteristicNotification(BluetoothGatt gatt, String servicesUUID, String characteristicUUID) {
         if (gatt == null){
             LOGUtils.e("Error! enableLostNordic() gatt == null");
@@ -90,7 +88,6 @@ public class BLEUtils {
     /**
      * 关闭通知
      */
-    @SuppressLint("MissingPermission")
     public static Boolean disableCharacteristicNotification(BluetoothGatt gatt, String servicesUUID, String characteristicUUID) {
         if (gatt == null){
             LOGUtils.e("Error! enableLostNordic() gatt == null");
@@ -114,7 +111,6 @@ public class BLEUtils {
      * 设备是否连接
      * @param device 蓝牙设备对象
      */
-    @SuppressLint("MissingPermission")
     public static boolean isBLEConnected(BluetoothDevice device) {
         if (device == null) {
             LOGUtils.e("BLEDevices isConnect() device==null");

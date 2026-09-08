@@ -1,18 +1,16 @@
 package com.linkiing.ble;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.os.ParcelUuid;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
 import com.linkiing.ble.api.BLENotifyDataFormat;
 import com.linkiing.ble.api.BLEReadDataFormat;
 import com.linkiing.ble.api.BLEWriteDataFormat;
-
-import org.jetbrains.annotations.NotNull;
+import com.linkiing.ble.utils.BLEPermissionsUtils;
+import com.linkiing.ble.utils.ScanRecordUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +18,6 @@ import java.util.List;
 /**
  * 扫描到的设备数据类
  */
-@SuppressLint("MissingPermission")
 public class BLEDevice extends IBluetoothGattCallback {
     private BluetoothDevice device = null;
     private String deviceName = "";
@@ -31,7 +28,11 @@ public class BLEDevice extends IBluetoothGattCallback {
     private final List<Integer> rssiList = new ArrayList<>();
 
     public void setData(@NonNull BluetoothDevice device, @NonNull byte[] scanRecord, List<ParcelUuid> parcelUuids, int rssi) {
-        this.deviceName = device.getName() != null ? device.getName() : "";
+        if (BLEPermissionsUtils.checkPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            this.deviceName = device.getName() != null ? device.getName() : "";
+        } else {
+            this.deviceName = ScanRecordUtil.parseFromBytes(scanRecord).getDeviceName();
+        }
         this.deviceMac = device.getAddress() != null ? device.getAddress() : "";
         setDevice(device);
         setScanRecord(scanRecord);

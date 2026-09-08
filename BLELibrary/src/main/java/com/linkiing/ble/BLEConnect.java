@@ -1,6 +1,6 @@
 package com.linkiing.ble;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -19,6 +19,7 @@ import com.linkiing.ble.api.BLEManager;
 import com.linkiing.ble.callback.BLEConnectStatusCallback;
 import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
+import com.linkiing.ble.utils.BLEPermissionsUtils;
 import com.linkiing.ble.utils.ByteUtils;
 
 import java.lang.ref.WeakReference;
@@ -30,7 +31,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * 蓝牙连接
  */
-@SuppressLint("MissingPermission")
 class BLEConnect implements BLEConnectCallback {
     private static final String TAG = "BLEConnect";
     public static final int hanConnect = 1001;
@@ -147,6 +147,11 @@ class BLEConnect implements BLEConnectCallback {
      */
     @Override
     public synchronized boolean connect(BLEDevice bleDevice) {
+        if (!BLEPermissionsUtils.checkPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            LOGUtils.e(TAG + " connect() BLUETOOTH_CONNECT Permission false");
+            return false;
+        }
+
         if (bleDevice == null) {
             LOGUtils.e(TAG + " connect() device == null");
             return false;

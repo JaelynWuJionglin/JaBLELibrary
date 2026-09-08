@@ -1,6 +1,5 @@
 package com.linkiing.ble;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -12,14 +11,11 @@ import com.linkiing.ble.callback.BLEReadRssiCallback;
 import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.ByteUtils;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.UUID;
 
 /**
  * BluetoothGattCallback
  */
-@SuppressLint("MissingPermission")
 abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     protected final BLEConnectCallback bleConnect = new BLEConnect(this);
     protected final BLEWriteCallback bleCommandPolicy = new BLECommandPolicy();
@@ -27,26 +23,25 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     /**
      * 获取当前设备
      */
-    @NotNull
     protected abstract BLEDevice getCurrentDevice();
 
-    private boolean isThisGatt(BluetoothGatt gatt) {
+    private boolean isUnrelatedGatt(BluetoothGatt gatt) {
         if (gatt == null) {
             LOGUtils.e("isGatt() Error! gatt == null");
-            return false;
+            return true;
         }
         if (getCurrentDevice() == null) {
             LOGUtils.e("isGatt() Error! getCurrentDevice() == null");
-            return false;
+            return true;
         }
-        return ByteUtils.macAddressSame(gatt.getDevice().getAddress(),getCurrentDevice().getDeviceMac());
+        return !ByteUtils.macAddressSame(gatt.getDevice().getAddress(), getCurrentDevice().getDeviceMac());
     }
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
         super.onConnectionStateChange(gatt, status, newState);
         LOGUtils.v("onConnectionStateChange ==> status:" + status + "   newState:" + newState);
-        if (!isThisGatt(gatt)) {
+        if (isUnrelatedGatt(gatt)) {
             return;
         }
         if (gatt.getDevice().getAddress().equals(getCurrentDevice().getDeviceMac())) {
@@ -59,7 +54,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
         super.onServicesDiscovered(gatt, status);
-        if (!isThisGatt(gatt)) {
+        if (isUnrelatedGatt(gatt)) {
             return;
         }
         LOGUtils.logUUID(gatt);
@@ -72,7 +67,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         super.onCharacteristicChanged(gatt, characteristic);
-        if (!isThisGatt(gatt)) {
+        if (isUnrelatedGatt(gatt)) {
             return;
         }
         if (characteristic != null) {
@@ -95,7 +90,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicWrite(gatt, characteristic, status);
         //LOGUtils.e("----------> onCharacteristicWrite: uuid:" + characteristic.getUuid().toString() + " status:" + status);
-        if (!isThisGatt(gatt)) {
+        if (isUnrelatedGatt(gatt)) {
             return;
         }
         if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -110,7 +105,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicRead(gatt, characteristic, status);
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            if (!isThisGatt(gatt)) {
+            if (isUnrelatedGatt(gatt)) {
                 return;
             }
             if (characteristic != null) {
@@ -130,7 +125,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     @Override
     public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
         super.onDescriptorWrite(gatt, descriptor, status);
-        if (!isThisGatt(gatt)) {
+        if (isUnrelatedGatt(gatt)) {
             return;
         }
         if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -145,7 +140,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     @Override
     public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
         super.onMtuChanged(gatt, mtu, status);
-        if (!isThisGatt(gatt)) {
+        if (isUnrelatedGatt(gatt)) {
             return;
         }
         bleConnect.onBLEMtuChanged(mtu, status);
@@ -159,7 +154,7 @@ abstract class IBluetoothGattCallback extends BluetoothGattCallback {
     public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
         super.onReadRemoteRssi(gatt, rssi, status);
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            if (!isThisGatt(gatt)) {
+            if (isUnrelatedGatt(gatt)) {
                 return;
             }
             for (BLEReadRssiCallback readRssiCallback : BLECallbackImp.getInstance().getReadRssiCallbackList()) {

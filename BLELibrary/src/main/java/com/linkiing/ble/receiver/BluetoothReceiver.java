@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 
 import com.linkiing.ble.BLECallbackImp;
 import com.linkiing.ble.BLEDevice;
-import com.linkiing.ble.api.BLEManager;
 import com.linkiing.ble.api.BLEScanner;
 import com.linkiing.ble.callback.BLEConnectStatusCallback;
 import com.linkiing.ble.callback.BLEOnOffStatusCallback;

@@ -1,6 +1,5 @@
 package com.linkiing.ble;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
@@ -218,7 +217,6 @@ class BLECommandPolicy implements BLEWriteCallback {
     }
 
     //写
-    @SuppressLint("MissingPermission")
     private boolean writeCharacteristic(@NonNull BluetoothGattCharacteristic characteristic, byte[] bytes, int writeType) {
         if (bytes == null || bytes.length == 0) {
             LOGUtils.e(TAG + " Error! bytes == null || bytes.length == 0");
@@ -236,7 +234,6 @@ class BLECommandPolicy implements BLEWriteCallback {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private boolean readCharacteristic(@NonNull BluetoothGattCharacteristic characteristic) {
         return bluetoothGatt.readCharacteristic(characteristic);
     }

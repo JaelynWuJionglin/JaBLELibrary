@@ -1,9 +1,12 @@
 package com.linkiing.ble.utils;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.Build;
 
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
 
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
@@ -31,6 +34,31 @@ public class BLEPermissionsUtils {
         msgTextId = mTextId;
         confirmTextId = cfTextId;
         cancelTextId = clTextId;
+    }
+
+    /*检查是否有某个权限*/
+    public static boolean checkPermission(String permission) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return ContextCompat.checkSelfPermission(
+                    BLEManager.getInstance().getContext(),
+                    permission) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true;
+        }
+    }
+
+    /*检查是否有蓝牙权限*/
+    public static boolean checkPermissionBle() {
+        boolean isPermission;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            isPermission = checkPermission(Manifest.permission.BLUETOOTH_SCAN)
+                    && checkPermission(Manifest.permission.BLUETOOTH_CONNECT);
+        } else {
+            isPermission = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        return isPermission;
     }
 
     /**

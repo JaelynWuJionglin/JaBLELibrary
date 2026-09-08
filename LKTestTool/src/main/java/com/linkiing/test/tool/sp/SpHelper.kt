@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.linkiing.ble.api.BLEConfig
 import com.linkiing.ble.api.BLEManager
 import com.linkiing.test.tool.bean.ConnectTestBean
 import kotlin.math.max

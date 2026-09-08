@@ -1,6 +1,6 @@
 package com.linkiing.ble.api;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -20,9 +20,9 @@ import com.linkiing.ble.callback.BLEScanDeviceCallback;
 import com.linkiing.ble.callback.BLEScannerFilterCallback;
 import com.linkiing.ble.log.LOGUtils;
 import com.linkiing.ble.utils.BLEConstant;
+import com.linkiing.ble.utils.BLEPermissionsUtils;
 import com.linkiing.ble.utils.BackstageUtils;
 import com.linkiing.ble.utils.ByteUtils;
-import com.linkiing.ble.utils.ScanRecordUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,13 +30,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 蓝牙扫描类
  */
-@SuppressLint("MissingPermission")
 public class BLEScanner extends ScanCallback implements BackstageUtils.BackstageListener {
     private volatile static BLEScanner instance = null;
     //相同设备发送间隔
@@ -588,6 +586,10 @@ public class BLEScanner extends ScanCallback implements BackstageUtils.Backstage
      * @param scanOrStop ture开启扫描    false停止扫描
      */
     private void isScan(boolean scanOrStop, int code) {
+        if (!BLEPermissionsUtils.checkPermission(Manifest.permission.BLUETOOTH_SCAN)) {
+            LOGUtils.e("BLEScanner isScan() BLUETOOTH_SCAN Permission false");
+            return;
+        }
         LOGUtils.d("BLEScanner isScan  scanOrStop:" + scanOrStop + "  code:" + code);
         if (mBluetoothAdapter == null) {
             mBluetoothAdapter = BLEManager.getInstance().getBluetoothAdapter();

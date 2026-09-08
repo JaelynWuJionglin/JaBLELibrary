@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.linkiing.ble.BLEDevice
-import com.linkiing.ble.NotificationFormat
 import com.linkiing.ble.api.BLEConfig
 import com.linkiing.ble.api.BLEManager
 import com.linkiing.ble.api.BLEScanner
@@ -32,7 +31,6 @@ import com.linkiing.test.tool.utlis.ByteUtils
 import com.linkiing.test.tool.utlis.ExcelUtils
 import com.linkiing.test.tool.utlis.ToastUtils
 import com.linkiing.test.tool.view.WcLinearLayoutManager
-import kotlin.collections.listOf
 
 class ScanActivity : BaseActivity<ActivityScanBinding>(), BLEScanDeviceCallback,
     BLEConnectStatusCallback {
